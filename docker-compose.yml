@@ -1,0 +1,40 @@
+version: "3.9"
+
+volumes:
+  es_shipping_database_data:
+    driver: local
+  eventstore-volume-data:
+  eventstore-volume-logs:
+
+services:
+  es_shipping_database:
+    image: postgres:14.0
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=es_shipping_db
+      - POSTGRES_PASSWORD=es_shipping_pass
+    volumes:
+      - es_shipping_database_data:/var/lib/postgresql/es_shipping_data
+
+  es_shipping_event_store:
+    image: eventstore/eventstore:release-5.0.11
+    ports:
+      - 2113:2113
+      - 1113:1113
+    environment:
+      - EVENTSTORE_CLUSTER_SIZE=1
+      - EVENTSTORE_RUN_PROJECTIONS=All
+      - EVENTSTORE_START_STANDARD_PROJECTIONS=true
+      - EVENTSTORE_EXT_TCP_PORT=1113
+      - EVENTSTORE_HTTP_PORT=2113
+      - EVENTSTORE_INSECURE=true
+      - EVENTSTORE_ENABLE_EXTERNAL_TCP=true
+      - EVENTSTORE_ENABLE_ATOM_PUB_OVER_HTTP=true
+    volumes:
+      - type: volume
+        source: eventstore-volume-data
+        target: /var/lib/eventstore
+      - type: volume
+        source: eventstore-volume-logs
+        target: /var/log/eventstore
