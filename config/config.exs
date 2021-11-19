@@ -12,6 +12,10 @@ config :es_shipping,
   generators: [binary_id: true]
 
 config :es_shipping, EsShipping.Application,
+  pubsub: :local,
+  registry: :local
+
+config :es_shipping, EsShipping.CommandedApp,
   event_store: [
     adapter: Commanded.EventStore.Adapters.Extreme,
     serializer: Commanded.Serialization.JsonSerializer,
@@ -25,9 +29,7 @@ config :es_shipping, EsShipping.Application,
       reconnect_delay: 2_000,
       max_attempts: :infinity
     ]
-  ],
-  pubsub: :local,
-  registry: :local
+  ]
 
 # Configures the endpoint
 config :es_shipping, EsShippingWeb.Endpoint,

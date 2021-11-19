@@ -2,12 +2,12 @@ defmodule EsShipping.Application do
   @moduledoc false
 
   use Application
-  use Commanded.Application, otp_app: :es_shipping
 
   @impl true
   def start(_type, _args) do
     children = [
       EsShipping.Repo,
+      EsShipping.CommandedApp,
       EsShippingWeb.Telemetry,
       {Phoenix.PubSub, name: EsShipping.PubSub},
       EsShippingWeb.Endpoint

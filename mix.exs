@@ -33,6 +33,7 @@ defmodule EsShipping.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # General deps
       {:phoenix, "~> 1.6.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.6"},
@@ -41,10 +42,12 @@ defmodule EsShipping.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
+      {:commanded, "~> 1.3"},
+      {:commanded_extreme_adapter, "~> 1.1"},
+
+      # Dev/test deps
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
-      {:commanded, "~> 1.3"},
-      {:commanded_extreme_adapter, "~> 1.1"}
     ]
   end
 
