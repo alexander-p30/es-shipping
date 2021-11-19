@@ -46,8 +46,9 @@ defmodule EsShipping.MixProject do
       {:commanded_extreme_adapter, "~> 1.1"},
 
       # Dev/test deps
-      {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false},
     ]
   end
 
