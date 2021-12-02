@@ -97,7 +97,8 @@
         {Credo.Check.Warning.LeakyEnvironment, false},
         {Credo.Check.Warning.MapGetUnsafePass, false},
         {Credo.Check.Warning.UnsafeToAtom, false},
-        {CredoNaming.Check.Consistency.ModuleFilename, [excluded_paths: ["test/support/"]]}
+        {CredoNaming.Check.Consistency.ModuleFilename,
+         [excluded_paths: ["test/support/", "lib/es_shipping_web/", "lib/es_shipping_web/views"]]}
       ]
     }
   ]
