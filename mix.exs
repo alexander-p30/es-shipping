@@ -25,6 +25,7 @@ defmodule EsShipping.MixProject do
   end
 
   # Specifies which paths to compile per environment.
+  defp elixirc_paths(:dev), do: ["lib", "test/support"]
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -49,6 +50,7 @@ defmodule EsShipping.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
       {:credo_naming, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:ex_machina, "~> 2.7.0", only: [:dev, :test]}
     ]
   end
 
