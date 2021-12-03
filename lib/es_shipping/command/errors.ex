@@ -6,12 +6,20 @@ defmodule EsShipping.Command.Errors do
   alias Ecto.Changeset, as: C
   alias EsShipping.Harbors.Commands.CreateHarbor, as: CH
 
+  @harbors_field_errors [
+    {:name, :must_have_name},
+    {:is_active, :must_have_is_active},
+    {:x_pos, :x_pos_must_be_above_0},
+    {:y_pos, :y_pos_must_be_above_0}
+  ]
+
+  @field_errors @harbors_field_errors
+
   @spec parse_error(changeset :: Ecto.Changeset.t()) :: atom()
   def parse_error(%C{valid?: true}),
     do: raise(ArgumentError, "Only invalid changesets can be parsed.")
 
-  def parse_error(%C{data: %CH{}, errors: [name: _]}), do: :must_have_name
-  def parse_error(%C{data: %CH{}, errors: [is_active: _]}), do: :must_have_is_active
-  def parse_error(%C{data: %CH{}, errors: [x_pos: _]}), do: :x_pos_must_be_above_0
-  def parse_error(%C{data: %CH{}, errors: [y_pos: _]}), do: :y_pos_must_be_above_0
+  Enum.each(@field_errors, fn {field, error} ->
+    def parse_error(%C{data: %CH{}, errors: [{unquote(field), _} | _]}), do: unquote(error)
+  end)
 end
