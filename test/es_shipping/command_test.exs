@@ -36,18 +36,37 @@ defmodule EsShipping.CommandTest do
       end
     end
 
-    test "convert changeset error in an invalid field to a descriptive atom" do
+    test "convert changeset error of an invalid field value to a descriptive atom" do
       Enum.each(
         [
           {build(:create_harbor, name: nil), :must_have_name},
           {build(:create_harbor, is_active: nil), :must_have_is_active},
-          {build(:create_harbor, x_pos: -1), :x_pos_must_be_above_0},
-          {build(:create_harbor, y_pos: nil), :y_pos_must_be_above_0}
+          {build(:create_harbor, x_pos: -1), :x_pos_must_be_higher_than_0},
+          {build(:create_harbor, y_pos: nil), :y_pos_must_be_higher_than_0}
         ],
         fn {invalid_command, descriptive_atom} ->
           assert descriptive_atom == Command.parse_error(run_changeset(invalid_command))
         end
       )
+    end
+
+    test "always convert first changeset error of an invalid field value to a descriptive atom " <>
+           "when there are multiple errors" do
+      changeset_with_multiple_errors =
+        :create_harbor |> build(name: nil, is_active: nil) |> run_changeset()
+
+      assert %{name: ["can't be blank"], is_active: ["can't be blank"]} ==
+               errors_on(changeset_with_multiple_errors)
+
+      assert :must_have_name == Command.parse_error(changeset_with_multiple_errors)
+
+      changeset_with_multiple_errors =
+        :create_harbor |> build(is_active: nil, x_pos: -1) |> run_changeset()
+
+      assert %{is_active: ["can't be blank"], x_pos: ["must be greater than or equal to 0"]} ==
+               errors_on(changeset_with_multiple_errors)
+
+      assert :x_pos_must_be_higher_than_0 == Command.parse_error(changeset_with_multiple_errors)
     end
   end
 

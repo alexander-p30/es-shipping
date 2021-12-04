@@ -9,8 +9,8 @@ defmodule EsShipping.Command.Errors do
   @harbors_field_errors [
     {:name, :must_have_name},
     {:is_active, :must_have_is_active},
-    {:x_pos, :x_pos_must_be_above_0},
-    {:y_pos, :y_pos_must_be_above_0}
+    {:x_pos, :x_pos_must_be_higher_than_0},
+    {:y_pos, :y_pos_must_be_higher_than_0}
   ]
 
   @field_errors @harbors_field_errors
