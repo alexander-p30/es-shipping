@@ -3,7 +3,7 @@ import Config
 config :es_shipping, EsShipping.Repo,
   username: "es_shipping_db",
   password: "es_shipping_pass",
-  database: "es_shipping_test#{System.get_env("MIX_TEST_PARTITION")}",
+  database: "es_shipping_test",
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10

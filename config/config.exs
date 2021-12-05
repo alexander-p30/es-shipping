@@ -15,7 +15,7 @@ config :es_shipping, EsShipping.Application,
   pubsub: :local,
   registry: :local
 
-config :es_shipping, EsShipping.CommandedApp,
+config :es_shipping, EsShipping.EventSourcing.CommandedApp,
   event_store: [
     adapter: Commanded.EventStore.Adapters.Extreme,
     serializer: Commanded.Serialization.JsonSerializer,
@@ -24,8 +24,8 @@ config :es_shipping, EsShipping.CommandedApp,
       db_type: :node,
       host: "localhost",
       port: 1113,
-      username: "es_shipping",
-      password: "ess",
+      username: "admin",
+      password: "changeit",
       reconnect_delay: 2_000,
       max_attempts: :infinity
     ]

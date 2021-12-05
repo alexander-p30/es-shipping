@@ -7,10 +7,10 @@ defmodule EsShipping.Application do
   def start(_type, _args) do
     children = [
       EsShipping.Repo,
-      EsShipping.CommandedApp,
       EsShippingWeb.Telemetry,
       {Phoenix.PubSub, name: EsShipping.PubSub},
-      EsShippingWeb.Endpoint
+      EsShippingWeb.Endpoint,
+      EsShipping.EventSourcing.Supervisor
     ]
 
     opts = [strategy: :one_for_one, name: EsShipping.Supervisor]
