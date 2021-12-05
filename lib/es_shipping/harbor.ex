@@ -26,4 +26,15 @@ defmodule EsShipping.Harbor do
       {:error, changeset} -> {:error, Command.parse_error(changeset)}
     end
   end
+
+  @spec apply(t(), harbor_event()) :: t()
+  def apply(%__MODULE__{} = harbor, %HarborCreated{} = event) do
+    %__MODULE__{
+      harbor
+      | name: event.name,
+        is_active: event.is_active,
+        x_pos: event.x_pos,
+        y_pos: event.y_pos
+    }
+  end
 end

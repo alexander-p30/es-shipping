@@ -82,7 +82,14 @@
         {Credo.Check.Readability.SinglePipe, false},
         {Credo.Check.Readability.Specs,
          [
-           files: %{excluded: ["test/", "lib/es_shipping_web.ex", "lib/es_shipping_web/"]},
+           files: %{
+             excluded: [
+               "test/",
+               "lib/es_shipping_web.ex",
+               "lib/es_shipping_web/",
+               "lib/es_shipping/event_sourcing/supervisor.ex"
+             ]
+           },
            include_defp: true
          ]},
         {Credo.Check.Readability.StrictModuleLayout, false},

@@ -1,4 +1,9 @@
 defmodule EsShipping.EventSourcing.Supervisor do
+  @moduledoc """
+  Supervisor used for managing event sourcing specific
+  applications, such as dependencies applications and
+  event handlers.
+  """
   use Supervisor
 
   alias EsShipping.EventSourcing.CommandedApp
