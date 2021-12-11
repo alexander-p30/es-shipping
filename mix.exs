@@ -65,7 +65,19 @@ defmodule EsShipping.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
+      "event_store.setup": ["event_store.create", "event_store.init"],
+      "event_store.reset": ["event_store.drop", "event_store.setup"],
+      "event_store.setup_test": [
+        "event_store.drop --quiet",
+        "event_store.create --quiet",
+        "event_store.init --quiet"
+      ],
+      test: [
+        "ecto.create --quiet",
+        "ecto.migrate --quiet",
+        "event_store.setup_test",
+        "test"
+      ]
     ]
   end
 end
