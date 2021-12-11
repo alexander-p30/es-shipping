@@ -62,20 +62,14 @@ defmodule EsShipping.MixProject do
   # See the documentation for `Mix` for more info on aliases.
   defp aliases do
     [
-      setup: ["deps.get", "ecto.setup"],
+      setup: ["deps.get", "ecto.setup", "event_store.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       "event_store.setup": ["event_store.create", "event_store.init"],
       "event_store.reset": ["event_store.drop", "event_store.setup"],
-      "event_store.setup_test": [
-        "event_store.drop --quiet",
-        "event_store.create --quiet",
-        "event_store.init --quiet"
-      ],
       test: [
         "ecto.create --quiet",
         "ecto.migrate --quiet",
-        "event_store.setup_test",
         "test"
       ]
     ]

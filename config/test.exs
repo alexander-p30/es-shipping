@@ -8,14 +8,11 @@ config :es_shipping, EsShipping.Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
-config :es_shipping, EsShipping.EventSourcing.EventStore,
-  serializer: Commanded.Serialization.JsonSerializer,
-  username: "event_store_db",
-  password: "event_store_pass",
-  database: "event_store_test",
-  hostname: "localhost",
-  port: "2113",
-  pool_size: 10
+config :es_shipping, EsShipping.EventSourcing.CommandedApp,
+  event_store: [
+    adapter: Commanded.EventStore.Adapters.InMemory,
+    serializer: Commanded.Serialization.JsonSerializer
+  ]
 
 config :es_shipping, EsShippingWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
