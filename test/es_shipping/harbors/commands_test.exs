@@ -2,11 +2,11 @@ defmodule EsShipping.Harbors.CommandsTest do
   use EsShipping.DataCase, async: true
 
   alias EsShipping.Harbors.Commands
-  alias EsShipping.Harbors.Commands.CreateHarbor
-  alias EsShipping.Harbors.Commands.UpdateHarbor
+  alias EsShipping.Harbors.Commands.Create
+  alias EsShipping.Harbors.Commands.Update
 
   setup_all do
-    create_command = %CreateHarbor{
+    create_command = %Create{
       id: Ecto.UUID.generate(),
       name: "Hamburg",
       is_active: true,
@@ -14,7 +14,7 @@ defmodule EsShipping.Harbors.CommandsTest do
       y_pos: 0
     }
 
-    update_command = %UpdateHarbor{
+    update_command = %Update{
       name: "Bruges",
       is_active: true,
       x_pos: 12,
@@ -30,7 +30,7 @@ defmodule EsShipping.Harbors.CommandsTest do
     end
 
     test "return an invalid create command changeset when required params are missing" do
-      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(%CreateHarbor{})
+      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(%Create{})
 
       assert %{
                id: ["can't be blank"],
@@ -42,14 +42,14 @@ defmodule EsShipping.Harbors.CommandsTest do
     end
 
     test "return an invalid create command changeset when x_pos is invalid", ctx do
-      command = %CreateHarbor{ctx.create_command | x_pos: -1}
+      command = %Create{ctx.create_command | x_pos: -1}
 
       assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(command)
       assert %{x_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
     end
 
     test "return an invalid create command changeset when y_pos is invalid", ctx do
-      command = %CreateHarbor{ctx.create_command | y_pos: -1}
+      command = %Create{ctx.create_command | y_pos: -1}
 
       assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(command)
       assert %{y_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
@@ -62,7 +62,7 @@ defmodule EsShipping.Harbors.CommandsTest do
     end
 
     test "return an invalid update command changeset when required params are missing" do
-      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(%UpdateHarbor{})
+      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(%Update{})
 
       assert %{
                name: ["can't be blank"],
@@ -73,14 +73,14 @@ defmodule EsShipping.Harbors.CommandsTest do
     end
 
     test "return an invalid update command changeset when x_pos is invalid", ctx do
-      command = %UpdateHarbor{ctx.update_command | x_pos: -1}
+      command = %Update{ctx.update_command | x_pos: -1}
 
       assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(command)
       assert %{x_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
     end
 
     test "return an invalid update command changeset when y_pos is invalid", ctx do
-      command = %UpdateHarbor{ctx.update_command | y_pos: -1}
+      command = %Update{ctx.update_command | y_pos: -1}
 
       assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(command)
       assert %{y_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)

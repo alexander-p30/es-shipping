@@ -2,8 +2,8 @@ defmodule EsShipping.Factory.Harbors do
   defmacro __using__(_) do
     quote do
       alias EsShipping.Harbor
-      alias EsShipping.Harbors.Commands.CreateHarbor
-      alias EsShipping.Harbors.Events.HarborCreated
+      alias EsShipping.Harbors.Commands.Create
+      alias EsShipping.Harbors.Events.Created
 
       def harbor_factory(attrs) do
         harbor = %Harbor{name: "a name", is_active: true, x_pos: 0, y_pos: 0}
@@ -12,7 +12,7 @@ defmodule EsShipping.Factory.Harbors do
       end
 
       def create_harbor_factory(attrs) do
-        command = %CreateHarbor{
+        command = %Create{
           id: Ecto.UUID.generate(),
           name: "a name",
           is_active: true,
@@ -24,7 +24,7 @@ defmodule EsShipping.Factory.Harbors do
       end
 
       def harbor_created_factory(attrs) do
-        event = %HarborCreated{
+        event = %Created{
           id: Ecto.UUID.generate(),
           name: "a name",
           is_active: true,

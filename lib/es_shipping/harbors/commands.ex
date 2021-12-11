@@ -7,8 +7,8 @@ defmodule EsShipping.Harbors.Commands do
 
   import Ecto.Changeset
 
-  alias EsShipping.Harbors.Commands.CreateHarbor, as: Create
-  alias EsShipping.Harbors.Commands.UpdateHarbor, as: Update
+  alias EsShipping.Harbors.Commands.Create
+  alias EsShipping.Harbors.Commands.Update
 
   @type t() :: Create.t() | Update.t()
 

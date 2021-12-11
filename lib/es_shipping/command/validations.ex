@@ -6,8 +6,8 @@ defmodule EsShipping.Command.Validations do
 
   alias EsShipping.Command
   alias EsShipping.Harbors.Commands, as: HarborCommands
-  alias EsShipping.Harbors.Commands.CreateHarbor
-  alias EsShipping.Harbors.Commands.UpdateHarbor
+  alias EsShipping.Harbors.Commands.Create, as: CreateHarbor
+  alias EsShipping.Harbors.Commands.Update, as: UpdateHarbor
 
   @harbor_commands [CreateHarbor, UpdateHarbor]
 

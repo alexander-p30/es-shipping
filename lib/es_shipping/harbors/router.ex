@@ -2,7 +2,7 @@ defmodule EsShipping.Harbors.Router do
   use Commanded.Commands.Router
 
   alias EsShipping.Harbor
-  alias EsShipping.Harbors.Commands.CreateHarbor
+  alias EsShipping.Harbors.Commands.Create
 
-  dispatch(CreateHarbor, to: Harbor, identity: :id)
+  dispatch(Create, to: Harbor, identity: :id)
 end

@@ -6,10 +6,10 @@ defmodule EsShipping.Command.Events do
   alias EsShipping.Command
   alias EsShipping.Event
 
-  alias EsShipping.Harbors.Commands.CreateHarbor, as: CH
-  alias EsShipping.Harbors.Commands.UpdateHarbor, as: UH
-  alias EsShipping.Harbors.Events.HarborCreated, as: HC
-  alias EsShipping.Harbors.Events.HarborUpdated, as: HU
+  alias EsShipping.Harbors.Commands.Create, as: CH
+  alias EsShipping.Harbors.Commands.Update, as: UH
+  alias EsShipping.Harbors.Events.Created, as: HC
+  alias EsShipping.Harbors.Events.Updated, as: HU
 
   @spec from_command(command :: Command.t()) :: Event.t()
   def from_command(%CH{} = cmd),

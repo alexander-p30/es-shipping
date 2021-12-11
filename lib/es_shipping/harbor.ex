@@ -5,9 +5,9 @@ defmodule EsShipping.Harbor do
 
   alias EsShipping.Command
   alias EsShipping.Harbors.Commands
-  alias EsShipping.Harbors.Commands.CreateHarbor
-  alias EsShipping.Harbors.Commands.UpdateHarbor
-  alias EsShipping.Harbors.Events.HarborCreated
+  alias EsShipping.Harbors.Commands.Create
+  alias EsShipping.Harbors.Commands.Update
+  alias EsShipping.Harbors.Events.Created
 
   @type t :: %__MODULE__{
           id: Ecto.UUID.t() | nil,
@@ -18,7 +18,7 @@ defmodule EsShipping.Harbor do
         }
 
   @type harbor_command :: Commands.t()
-  @type harbor_event :: HarborCreated.t()
+  @type harbor_event :: Created.t()
 
   @struct_fields ~w(id name x_pos y_pos is_active)a
 
@@ -26,16 +26,16 @@ defmodule EsShipping.Harbor do
   defstruct @struct_fields
 
   @spec execute(t(), harbor_command()) :: harbor_event() | {:error, atom()}
-  def execute(%__MODULE__{id: nil}, %CreateHarbor{} = command) do
+  def execute(%__MODULE__{id: nil}, %Create{} = command) do
     do_execute(command)
   end
 
-  def execute(%__MODULE__{id: id}, %UpdateHarbor{} = command) when not is_nil(id) do
+  def execute(%__MODULE__{id: id}, %Update{} = command) when not is_nil(id) do
     do_execute(command)
   end
 
   @spec apply(t(), harbor_event()) :: t()
-  def apply(%__MODULE__{} = harbor, %HarborCreated{} = event) do
+  def apply(%__MODULE__{} = harbor, %Created{} = event) do
     %__MODULE__{
       harbor
       | id: event.id,
