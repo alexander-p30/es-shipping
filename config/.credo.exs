@@ -22,7 +22,7 @@
         {Credo.Check.Consistency.SpaceInParentheses, []},
         {Credo.Check.Consistency.TabsOrSpaces, []},
         {Credo.Check.Design.AliasUsage, false},
-        {Credo.Check.Design.TagTODO, [exit_status: 2]},
+        {Credo.Check.Design.TagTODO, [exit_status: 0]},
         {Credo.Check.Design.TagFIXME, []},
         {Credo.Check.Readability.AliasOrder, []},
         {Credo.Check.Readability.FunctionNames, []},
@@ -105,7 +105,7 @@
         {Credo.Check.Warning.MapGetUnsafePass, false},
         {Credo.Check.Warning.UnsafeToAtom, false},
         {CredoNaming.Check.Consistency.ModuleFilename,
-         [excluded_paths: ["test/support/", "lib/es_shipping_web/", "lib/es_shipping_web/views"]]}
+         [excluded_paths: ["test/support/", "lib/es_shipping_web/views/"]]}
       ]
     }
   ]

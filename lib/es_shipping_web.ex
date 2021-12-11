@@ -23,6 +23,22 @@ defmodule EsShippingWeb do
 
       import Plug.Conn
       alias EsShippingWeb.Router.Helpers, as: Routes
+
+      defp send_json(conn, status, body, details \\ [])
+
+      defp send_json(conn, status, body, details) when status >= 400 do
+        content = details |> Map.new(& &1) |> Map.merge(%{error: body})
+
+        conn
+        |> put_resp_header("content-type", "application/json")
+        |> send_resp(status, Jason.encode!(content))
+      end
+
+      defp send_json(conn, status, body, _details) do
+        conn
+        |> put_resp_header("content-type", "application/json")
+        |> send_resp(status, Jason.encode!(body))
+      end
     end
   end
 
