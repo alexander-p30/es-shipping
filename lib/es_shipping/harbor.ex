@@ -8,6 +8,7 @@ defmodule EsShipping.Harbor do
   alias EsShipping.Harbors.Events.HarborCreated
 
   @type t :: %__MODULE__{
+          id: Ecto.UUID.t() | nil,
           name: String.t() | nil,
           is_active: boolean() | nil,
           x_pos: integer() | nil,
@@ -17,10 +18,10 @@ defmodule EsShipping.Harbor do
   @type harbor_command :: CreateHarbor.t()
   @type harbor_event :: HarborCreated.t()
 
-  defstruct ~w(name x_pos y_pos is_active)a
+  defstruct ~w(id name x_pos y_pos is_active)a
 
   @spec execute(t(), harbor_command()) :: harbor_event() | {:error, atom()}
-  def execute(%__MODULE__{name: nil}, %CreateHarbor{} = command) do
+  def execute(%__MODULE__{id: nil}, %CreateHarbor{} = command) do
     case Command.validate(command) do
       {:ok, command} -> Command.to_event(command)
       {:error, changeset} -> {:error, Command.parse_error(changeset)}
@@ -31,7 +32,8 @@ defmodule EsShipping.Harbor do
   def apply(%__MODULE__{} = harbor, %HarborCreated{} = event) do
     %__MODULE__{
       harbor
-      | name: event.name,
+      | id: event.id,
+        name: event.name,
         is_active: event.is_active,
         x_pos: event.x_pos,
         y_pos: event.y_pos

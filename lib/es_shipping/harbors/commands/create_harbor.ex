@@ -8,15 +8,18 @@ defmodule EsShipping.Harbors.Commands.CreateHarbor do
   import Ecto.Changeset
 
   @type t :: %__MODULE__{
+          id: Ecto.UUID.t() | nil,
           name: String.t() | nil,
           is_active: boolean() | nil,
           x_pos: integer() | nil,
           y_pos: integer() | nil
         }
 
-  @castable_fields ~w(name is_active x_pos y_pos)a
+  @castable_fields ~w(id name is_active x_pos y_pos)a
 
+  @primary_key false
   embedded_schema do
+    field :id, Ecto.UUID
     field :name, :string
     field :is_active, :boolean
 

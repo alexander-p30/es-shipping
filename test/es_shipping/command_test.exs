@@ -74,8 +74,13 @@ defmodule EsShipping.CommandTest do
     test "return corresponding event with correct data" do
       Enum.each(
         [
-          {%{name: "harbor name", is_active: true, x_pos: 255, y_pos: 64},
-           &build(:create_harbor, &1), &build(:harbor_created, &1)}
+          {%{
+             id: Ecto.UUID.generate(),
+             name: "harbor name",
+             is_active: true,
+             x_pos: 255,
+             y_pos: 64
+           }, &build(:create_harbor, &1), &build(:harbor_created, &1)}
         ],
         fn {attrs, build_command_fn, build_event_fn} ->
           assert build_event_fn.(attrs) == Command.to_event(build_command_fn.(attrs))

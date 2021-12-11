@@ -5,7 +5,13 @@ defmodule EsShipping.HarborTest do
 
   alias EsShipping.Harbor
 
-  @attrs %{name: "Sydney harbor", is_active: true, x_pos: 238, y_pos: 101_010}
+  @attrs %{
+    id: Ecto.UUID.generate(),
+    name: "Sydney harbor",
+    is_active: true,
+    x_pos: 238,
+    y_pos: 101_010
+  }
 
   setup_all do
     %{command: build(:create_harbor, @attrs), event: build(:harbor_created, @attrs)}
@@ -23,7 +29,7 @@ defmodule EsShipping.HarborTest do
 
     test "raise when identity field is not nil and command is create harbor", ctx do
       assert_raise FunctionClauseError, fn ->
-        Harbor.execute(%Harbor{name: "a name"}, ctx.command)
+        Harbor.execute(%Harbor{id: Ecto.UUID.generate()}, ctx.command)
       end
     end
   end
@@ -31,6 +37,7 @@ defmodule EsShipping.HarborTest do
   describe "apply/2" do
     test "return a mutated harbor struct with event attributes", ctx do
       mutated_harbor = %Harbor{
+        id: ctx.event.id,
         name: ctx.event.name,
         is_active: ctx.event.is_active,
         x_pos: ctx.event.x_pos,

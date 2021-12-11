@@ -4,6 +4,7 @@ defmodule EsShipping.Harbors.Events.HarborCreated do
   """
 
   @type t :: %__MODULE__{
+          id: Ecto.UUID.t() | nil,
           name: String.t() | nil,
           is_active: boolean() | nil,
           x_pos: integer() | nil,
@@ -11,5 +12,5 @@ defmodule EsShipping.Harbors.Events.HarborCreated do
         }
 
   @derive Jason.Encoder
-  defstruct ~w(name is_active x_pos y_pos)a
+  defstruct ~w(id name is_active x_pos y_pos)a
 end

@@ -12,13 +12,25 @@ defmodule EsShipping.Factory.Harbors do
       end
 
       def create_harbor_factory(attrs) do
-        command = %CreateHarbor{name: "a name", is_active: true, x_pos: 0, y_pos: 0}
+        command = %CreateHarbor{
+          id: Ecto.UUID.generate(),
+          name: "a name",
+          is_active: true,
+          x_pos: 0,
+          y_pos: 0
+        }
 
         merge_attributes(command, attrs)
       end
 
       def harbor_created_factory(attrs) do
-        event = %HarborCreated{name: "a name", is_active: true, x_pos: 0, y_pos: 0}
+        event = %HarborCreated{
+          id: Ecto.UUID.generate(),
+          name: "a name",
+          is_active: true,
+          x_pos: 0,
+          y_pos: 0
+        }
 
         merge_attributes(event, attrs)
       end
