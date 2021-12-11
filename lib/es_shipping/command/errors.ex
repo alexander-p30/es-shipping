@@ -7,10 +7,10 @@ defmodule EsShipping.Command.Errors do
   alias EsShipping.Harbors.Commands, as: Harbors
 
   @harbors_field_errors [
-    {Harbors, :name, :must_have_name},
-    {Harbors, :is_active, :must_have_is_active},
-    {Harbors, :x_pos, :x_pos_must_be_higher_than_0},
-    {Harbors, :y_pos, :y_pos_must_be_higher_than_0}
+    {Harbors, [:create, :update], :name, :must_have_name},
+    {Harbors, [:create, :update], :is_active, :must_have_is_active},
+    {Harbors, [:create, :update], :x_pos, :x_pos_must_be_higher_than_0},
+    {Harbors, [:create, :update], :y_pos, :y_pos_must_be_higher_than_0}
   ]
 
   @field_errors @harbors_field_errors
@@ -19,8 +19,23 @@ defmodule EsShipping.Command.Errors do
   def parse_error(%C{valid?: true}),
     do: raise(ArgumentError, "Only invalid changesets can be parsed for errors.")
 
-  Enum.each(@field_errors, fn {entity, field, error} ->
-    def parse_error(%C{data: %unquote(entity){}, errors: [{unquote(field), _} | _]}),
-      do: unquote(error)
+  Enum.each(@field_errors, fn
+    {entity, [_ | _] = commands, field, error} ->
+      Enum.each(commands, fn command ->
+        def parse_error(%C{
+              data: %unquote(entity){},
+              errors: [{unquote(field), _} | _],
+              changes: %{command: unquote(command)}
+            }),
+            do: unquote(error)
+      end)
+
+    {entity, command, field, error} ->
+      def parse_error(%C{
+            data: %unquote(entity){},
+            errors: [{unquote(field), _} | _],
+            changes: %{command: unquote(command)}
+          }),
+          do: unquote(error)
   end)
 end
