@@ -2,4 +2,32 @@ defmodule EsShipping.Factory do
   use ExMachina.Ecto, repo: EsShipping.Repo
 
   use EsShipping.Factory.Harbors
+
+  @spec json_params_for(factory :: atom(), attrs :: map() | Keyword.t(), opts :: Keyword.t()) ::
+          map()
+  def json_params_for(factory, attrs \\ %{}, opts \\ [])
+
+  def json_params_for(factory, attrs, opts) when is_atom(factory) do
+    factory
+    |> build(attrs)
+    |> Map.from_struct()
+    |> convert_to_json()
+    |> apply_opts(opts)
+  end
+
+  defp convert_to_json(%{} = map),
+    do: Map.new(map, fn {k, v} -> {convert_to_json(k), convert_to_json(v)} end)
+
+  defp convert_to_json(v) when is_atom(v), do: "#{v}"
+  defp convert_to_json(v), do: v
+
+  defp apply_opts(data, [{:id, _} | opts]) do
+    if opts[:id] do
+      apply_opts(data, opts)
+    else
+      apply_opts(Map.drop(data, ["id"]), opts)
+    end
+  end
+
+  defp apply_opts(data, []), do: data
 end
