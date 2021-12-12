@@ -12,6 +12,7 @@ defmodule EsShipping.Factory do
     |> build(attrs)
     |> Map.from_struct()
     |> convert_to_json()
+    |> drop_unwanted_fields()
     |> apply_opts(opts)
   end
 
@@ -20,6 +21,8 @@ defmodule EsShipping.Factory do
 
   defp convert_to_json(v) when is_atom(v), do: "#{v}"
   defp convert_to_json(v), do: v
+
+  defp drop_unwanted_fields(data), do: Map.drop(data, [:received_fields])
 
   defp apply_opts(data, [{:id, _} | opts]) do
     if opts[:id] do
