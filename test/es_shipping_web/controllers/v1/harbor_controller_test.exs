@@ -5,6 +5,7 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
 
   @base_url "/api/v1/harbors"
   @create_url @base_url
+  @update_url @base_url <> "/"
 
   describe "POST /harbors" do
     setup do
@@ -30,6 +31,41 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
 
       assert %{"error" => "must_have_name", "entity" => "harbor"} =
                ctx.conn |> post(@create_url, invalid_params) |> json_response(422)
+    end
+  end
+
+  describe "PUT /harbors/:id/" do
+    setup do
+      %{
+        create_params: json_params_for(:create_harbor, name: "Salvador", is_active: false),
+        update_params: json_params_for(:update_harbor, name: "Porto Alegre", x_pos: 400, y_pos: 0)
+      }
+    end
+
+    test "return a harbor json with updated fields when params are valid", ctx do
+      %{"name" => name, "is_active" => is_active, "x_pos" => x_pos, "y_pos" => y_pos} =
+        ctx.create_params
+
+      assert %{
+               "id" => id,
+               "name" => ^name,
+               "is_active" => ^is_active,
+               "x_pos" => ^x_pos,
+               "y_pos" => ^y_pos
+             } = ctx.conn |> post(@create_url, ctx.create_params) |> json_response(201)
+
+      assert Ecto.UUID.cast!(id)
+
+      %{"name" => name, "is_active" => is_active, "x_pos" => x_pos, "y_pos" => y_pos} =
+        ctx.update_params
+
+      assert %{
+               "id" => ^id,
+               "name" => ^name,
+               "is_active" => ^is_active,
+               "x_pos" => ^x_pos,
+               "y_pos" => ^y_pos
+             } = ctx.conn |> put(@update_url <> id, ctx.update_params) |> json_response(201)
     end
   end
 end
