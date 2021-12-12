@@ -90,22 +90,22 @@ defmodule EsShipping.Harbors.ContextTest do
 
     test "return error when name is invalid", %{params: params} do
       assert {:error, :must_have_name} ==
-               params |> Map.put("name", nil) |> Context.create_harbor()
+               Context.update_harbor(%{"id" => params["id"], "name" => nil})
     end
 
     test "return error when active status is invalid", %{params: params} do
       assert {:error, :must_have_is_active} ==
-               params |> Map.put("is_active", nil) |> Context.create_harbor()
+               Context.update_harbor(%{"id" => params["id"], "is_active" => nil})
     end
 
     test "return error when x_pos is invalid", %{params: params} do
       assert {:error, :x_pos_must_be_higher_than_0} ==
-               params |> Map.put("x_pos", -40) |> Context.create_harbor()
+               Context.update_harbor(%{"id" => params["id"], "x_pos" => -3})
     end
 
     test "return error when y_pos is invalid", %{params: params} do
       assert {:error, :y_pos_must_be_higher_than_0} ==
-               params |> Map.put("y_pos", -1_273_182) |> Context.create_harbor()
+               Context.update_harbor(%{"id" => params["id"], "y_pos" => -321})
     end
   end
 end
