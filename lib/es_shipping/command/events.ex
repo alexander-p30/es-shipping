@@ -23,6 +23,7 @@ defmodule EsShipping.Command.Events do
 
   def from_command(%UH{} = cmd),
     do: %HU{
+      id: cmd.id,
       name: cmd.name,
       is_active: cmd.is_active,
       x_pos: cmd.x_pos,

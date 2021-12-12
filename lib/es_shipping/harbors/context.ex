@@ -10,37 +10,28 @@ defmodule EsShipping.Harbors.Context do
   alias EsShipping.Harbors.Commands.Create
   alias EsShipping.Harbors.Commands.Update
 
-  @spec create_harbor(params :: map()) :: {:ok, Harbor.t()} | {:error, atom()}
-  def create_harbor(params) do
+  @typep command_execution :: {:ok, Harbor.t()} | {:error, atom()}
+
+  @spec create_harbor(params :: map()) :: command_execution()
+  def create_harbor(params), do: build_and_dispatch(Create, params)
+
+  @spec update_harbor(params :: map()) :: command_execution()
+  def update_harbor(params), do: build_and_dispatch(Update, params)
+
+  @spec build_and_dispatch(command :: module(), params :: map()) ::
+          {:ok, Harbor.t()} | {:error, atom()}
+  defp build_and_dispatch(command, params) do
     params
-    |> Map.put("id", Ecto.UUID.generate())
-    |> then(&build_command(Create, &1))
+    |> adjust_params()
+    |> command.new()
     |> CommandedApp.dispatch(returning: :aggregate_state)
   end
 
-  @spec update_harbor(params :: map()) :: {:ok, Harbor.t()} | {:error, atom()}
-  def update_harbor(params) do
-    Update
-    |> build_command(params)
-    |> CommandedApp.dispatch(returning: :aggregate_state)
+  @spec adjust_params(params :: map()) :: map()
+  defp adjust_params(%{} = params) do
+    Map.new(params, fn
+      {"" <> _ = k, v} -> {String.to_existing_atom(k), v}
+      {k, _} = kv when is_atom(k) -> kv
+    end)
   end
-
-  @spec build_command(command :: module(), params :: map()) ::
-          Create.t()
-  defp build_command(Create, params),
-    do: %Create{
-      id: params["id"],
-      name: params["name"],
-      is_active: params["is_active"],
-      x_pos: params["x_pos"],
-      y_pos: params["y_pos"]
-    }
-
-  defp build_command(Update, params),
-    do: %Update{
-      name: params["name"],
-      is_active: params["is_active"],
-      x_pos: params["x_pos"],
-      y_pos: params["y_pos"]
-    }
 end

@@ -13,7 +13,6 @@ defmodule EsShipping.Harbors.Commands do
   @type t() :: Create.t() | Update.t()
 
   @create_fields ~w(id name is_active x_pos y_pos)a
-  @update_fields ~w(name is_active x_pos y_pos)a
 
   @primary_key false
   embedded_schema do
@@ -29,17 +28,29 @@ defmodule EsShipping.Harbors.Commands do
   end
 
   @spec validate(command :: t()) :: Ecto.Changeset.t()
-  def validate(%Create{} = command), do: do_validate(command, @create_fields)
-  def validate(%Update{} = command), do: do_validate(command, @update_fields)
-
-  @spec do_validate(command :: t(), fields :: list(atom())) :: Ecto.Changeset.t()
-  defp do_validate(command, fields) do
+  def validate(%Create{} = command) do
     params = Map.from_struct(command)
 
     %__MODULE__{}
-    |> cast(params, fields)
+    |> cast(params, @create_fields)
     |> put_command(command)
-    |> validate_required(fields)
+    |> validate_required(@create_fields)
+    |> validate_common_fields()
+  end
+
+  def validate(%Update{received_fields: [_ | _]} = command) do
+    params = Map.from_struct(command)
+
+    %__MODULE__{}
+    |> cast(params, command.received_fields)
+    |> validate_required(command.received_fields)
+    |> put_command(command)
+    |> validate_common_fields()
+  end
+
+  @spec validate_common_fields(chagneset :: Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  defp validate_common_fields(changeset) do
+    changeset
     |> validate_number(:x_pos, greater_than_or_equal_to: 0)
     |> validate_number(:y_pos, greater_than_or_equal_to: 0)
     |> validate_unique_position()

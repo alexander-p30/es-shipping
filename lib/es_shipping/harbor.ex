@@ -8,6 +8,7 @@ defmodule EsShipping.Harbor do
   alias EsShipping.Harbors.Commands.Create
   alias EsShipping.Harbors.Commands.Update
   alias EsShipping.Harbors.Events.Created
+  alias EsShipping.Harbors.Events.Updated
 
   @type t :: %__MODULE__{
           id: Ecto.UUID.t() | nil,
@@ -30,7 +31,8 @@ defmodule EsShipping.Harbor do
     do_execute(command)
   end
 
-  def execute(%__MODULE__{id: id}, %Update{} = command) when not is_nil(id) do
+  def execute(%__MODULE__{id: aggregate_id}, %Update{} = command)
+      when not is_nil(aggregate_id) and aggregate_id == command.id do
     do_execute(command)
   end
 
@@ -40,6 +42,16 @@ defmodule EsShipping.Harbor do
       harbor
       | id: event.id,
         name: event.name,
+        is_active: event.is_active,
+        x_pos: event.x_pos,
+        y_pos: event.y_pos
+    }
+  end
+
+  def apply(%__MODULE__{} = harbor, %Updated{} = event) do
+    %__MODULE__{
+      harbor
+      | name: event.name,
         is_active: event.is_active,
         x_pos: event.x_pos,
         y_pos: event.y_pos

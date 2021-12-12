@@ -11,6 +11,11 @@ defmodule EsShipping.Command do
   @type t() :: HarborsCommands.t()
 
   @doc """
+  Builds a command with the received parameters.
+  """
+  @callback new(params :: map()) :: t()
+
+  @doc """
   Check the command's values validity according to its validation changeset.
   """
   @spec validate(command :: t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}

@@ -6,13 +6,13 @@ defmodule EsShipping.CommandTest do
   alias EsShipping.Command
 
   describe "validate/1" do
-    test "return a command struct when it is valid according to its changeset" do
+    test "return a command struct when the command values are valid" do
       valid_command = build(:create_harbor)
 
       assert {:ok, valid_command} == Command.validate(valid_command)
     end
 
-    test "return an invalid changeset when the command is not valid according to its changeset" do
+    test "return an invalid changeset when the command values are invalid" do
       invalid_command = build(:create_harbor, name: nil)
 
       assert {:error, %Ecto.Changeset{valid?: false}} = Command.validate(invalid_command)
@@ -32,7 +32,9 @@ defmodule EsShipping.CommandTest do
           {build(:create_harbor, name: nil), :must_have_name},
           {build(:create_harbor, is_active: nil), :must_have_is_active},
           {build(:create_harbor, x_pos: -1), :x_pos_must_be_higher_than_0},
-          {build(:create_harbor, y_pos: nil), :y_pos_must_be_higher_than_0}
+          {build(:create_harbor, y_pos: nil), :y_pos_must_be_higher_than_0},
+          {build(:update_harbor, x_pos: -1), :x_pos_must_be_higher_than_0},
+          {build(:update_harbor, y_pos: nil), :y_pos_must_be_higher_than_0}
         ],
         fn {invalid_command, descriptive_atom} ->
           assert descriptive_atom == invalid_command |> run_validation() |> Command.parse_error()
@@ -70,7 +72,14 @@ defmodule EsShipping.CommandTest do
              is_active: true,
              x_pos: 255,
              y_pos: 64
-           }, &build(:create_harbor, &1), &build(:harbor_created, &1)}
+           }, &build(:create_harbor, &1), &build(:harbor_created, &1)},
+          {%{
+             id: Ecto.UUID.generate(),
+             name: "updated harbor name",
+             is_active: false,
+             x_pos: 12_038,
+             y_pos: 0
+           }, &build(:update_harbor, &1), &build(:harbor_updated, &1)}
         ],
         fn {attrs, build_command_fn, build_event_fn} ->
           assert build_event_fn.(attrs) == Command.to_event(build_command_fn.(attrs))
