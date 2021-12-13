@@ -19,6 +19,7 @@ defmodule EsShipping.Factory do
   defp convert_to_json(%{} = map),
     do: Map.new(map, fn {k, v} -> {convert_to_json(k), convert_to_json(v)} end)
 
+  defp convert_to_json(v) when is_boolean(v), do: v
   defp convert_to_json(v) when is_atom(v), do: "#{v}"
   defp convert_to_json(v), do: v
 

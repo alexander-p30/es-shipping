@@ -7,6 +7,7 @@ defmodule EsShipping.EventSourcing.Supervisor do
   use Supervisor
 
   alias EsShipping.EventSourcing.CommandedApp
+  alias EsShipping.Harbors.Projector, as: HarborProjector
 
   def start_link(init_arg) do
     Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)
@@ -14,7 +15,10 @@ defmodule EsShipping.EventSourcing.Supervisor do
 
   @impl true
   def init(_init_arg) do
-    children = [CommandedApp]
+    children = [
+      CommandedApp,
+      {HarborProjector, application: CommandedApp, name: :v1_harbors_projector}
+    ]
 
     Supervisor.init(children, strategy: :one_for_one)
   end
