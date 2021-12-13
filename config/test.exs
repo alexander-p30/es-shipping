@@ -5,7 +5,6 @@ config :es_shipping, EsShipping.Repo,
   password: "es_shipping_pass",
   database: "es_shipping_test",
   hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 
 config :es_shipping, EsShipping.EventSourcing.CommandedApp,

@@ -1,5 +1,5 @@
 defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
-  use EsShippingWeb.ConnCase, async: true
+  use EsShippingWeb.ConnCase, async: false
 
   import EsShipping.Factory
 

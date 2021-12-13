@@ -1,11 +1,13 @@
 defmodule EsShipping.Harbors.ContextTest do
-  use EsShipping.InMemoryEventStoreCase, async: false
+  use EsShipping.DataCase, async: false
 
   import EsShipping.Factory
 
   alias EsShipping.EventSourcing.CommandedApp
   alias EsShipping.Harbor
   alias EsShipping.Harbors.Context
+  alias EsShipping.Harbors.Projection
+  alias EsShipping.Repo
 
   describe "create_harbor/1" do
     setup do
@@ -25,6 +27,18 @@ defmodule EsShipping.Harbors.ContextTest do
               }} = Context.create_harbor(params)
 
       assert Ecto.UUID.cast!(id)
+    end
+
+    test "persist read model projection in database", %{params: params} do
+      assert {:ok, %Harbor{} = harbor} = Context.create_harbor(params)
+
+      projection = Repo.one(Projection)
+
+      assert Map.from_struct(harbor) ==
+               Map.take(projection, [:id, :name, :is_active, :x_pos, :y_pos])
+
+      assert_in_delta NaiveDateTime.diff(projection.inserted_at, NaiveDateTime.utc_now()), 0, 1
+      assert_in_delta NaiveDateTime.diff(projection.updated_at, NaiveDateTime.utc_now()), 0, 1
     end
 
     test "return error when name is invalid", %{params: params} do
@@ -80,7 +94,7 @@ defmodule EsShipping.Harbors.ContextTest do
               %Harbor{
                 id: id,
                 name: ^name,
-                is_active: "true",
+                is_active: true,
                 x_pos: ^x_pos,
                 y_pos: ^y_pos
               }} = Context.update_harbor(ctx.params)

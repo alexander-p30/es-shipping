@@ -32,8 +32,15 @@ defmodule EsShippingWeb.ConnCase do
   end
 
   setup tags do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(EsShipping.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    if not tags[:async] do
+      {:ok, _} = Application.ensure_all_started(:es_shipping)
+
+      on_exit(fn ->
+        :ok = Application.stop(:es_shipping)
+        EsShipping.Storage.reset!()
+      end)
+    end
+
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

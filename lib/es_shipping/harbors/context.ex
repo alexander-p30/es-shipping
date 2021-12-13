@@ -24,7 +24,7 @@ defmodule EsShipping.Harbors.Context do
     params
     |> adjust_params()
     |> command.new()
-    |> CommandedApp.dispatch(returning: :aggregate_state)
+    |> CommandedApp.dispatch(returning: :aggregate_state, consistency: :strong)
   end
 
   @spec adjust_params(params :: map()) :: map()

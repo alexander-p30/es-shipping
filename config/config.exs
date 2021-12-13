@@ -5,6 +5,10 @@ config :es_shipping,
   generators: [binary_id: true],
   event_stores: [EsShipping.EventSourcing.EventStore]
 
+config :es_shipping, EsShipping.Repo,
+  migration_primary_key: [name: :id, type: :binary_id],
+  migration_foreign_key: [column: :id, type: :binary_id]
+
 config :es_shipping, EsShipping.Application,
   pubsub: :local,
   registry: :local
