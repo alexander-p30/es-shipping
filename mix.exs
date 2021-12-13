@@ -45,6 +45,7 @@ defmodule EsShipping.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:commanded, "~> 1.3"},
       {:commanded_eventstore_adapter, "~> 1.2"},
+      {:commanded_ecto_projections, "~> 1.2"},
 
       # Dev/test deps
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
