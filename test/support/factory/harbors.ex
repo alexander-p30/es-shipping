@@ -6,11 +6,24 @@ defmodule EsShipping.Factory.Harbors do
       alias EsShipping.Harbors.Commands.Update
       alias EsShipping.Harbors.Events.Created
       alias EsShipping.Harbors.Events.Updated
+      alias EsShipping.Harbors.Projection
 
       def harbor_factory(attrs) do
         harbor = %Harbor{name: "a name", is_active: true, x_pos: 0, y_pos: 0}
 
         merge_attributes(harbor, attrs)
+      end
+
+      def harbor_projection_factory(attrs) do
+        projection = %Projection{
+          id: Ecto.UUID.generate(),
+          name: "a name",
+          is_active: true,
+          x_pos: 0,
+          y_pos: 0
+        }
+
+        merge_attributes(projection, attrs)
       end
 
       def create_harbor_factory(attrs) do

@@ -1,5 +1,5 @@
 defmodule EsShipping.Harbors.CommandsTest do
-  use EsShipping.DataCase, async: true
+  use EsShipping.DataCase, async: false
 
   import EsShipping.Factory
 
@@ -59,6 +59,15 @@ defmodule EsShipping.Harbors.CommandsTest do
       assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(command)
       assert %{y_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
     end
+
+    test "return an invalid changeset when x_pos and y_pos were already taken", ctx do
+      insert(:harbor_projection, Map.from_struct(ctx.create_command))
+
+      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(ctx.create_command)
+
+      message = ["x, y combination already taken"]
+      assert %{x_pos: message, y_pos: message} == errors_on(changeset)
+    end
   end
 
   describe "validate/1 - update command" do
@@ -88,6 +97,15 @@ defmodule EsShipping.Harbors.CommandsTest do
 
       assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(command)
       assert %{y_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
+    end
+
+    test "return an invalid changeset when x_pos and y_pos were already taken", ctx do
+      insert(:harbor_projection, Map.from_struct(ctx.create_command))
+
+      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(ctx.create_command)
+
+      message = ["x, y combination already taken"]
+      assert %{x_pos: message, y_pos: message} == errors_on(changeset)
     end
   end
 end

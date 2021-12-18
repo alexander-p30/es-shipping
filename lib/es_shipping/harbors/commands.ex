@@ -9,6 +9,7 @@ defmodule EsShipping.Harbors.Commands do
 
   alias EsShipping.Harbors.Commands.Create
   alias EsShipping.Harbors.Commands.Update
+  alias EsShipping.Harbors.Repository
 
   @type t() :: Create.t() | Update.t()
 
@@ -61,8 +62,21 @@ defmodule EsShipping.Harbors.Commands do
   defp put_command(changeset, %Update{}), do: put_change(changeset, :command, :update)
 
   @spec validate_unique_position(changeset :: Ecto.Changeset.t()) :: Ecto.Changeset.t()
-  defp validate_unique_position(changeset) do
-    # TODO: validate if position is unique (will probably need a db query)
-    changeset
+  defp validate_unique_position(%Ecto.Changeset{valid?: true} = changeset) do
+    [x_pos: get_change(changeset, :x_pos), y_pos: get_change(changeset, :y_pos)]
+    |> Repository.get_by()
+    |> case do
+      [] ->
+        changeset
+
+      _ ->
+        Enum.reduce(
+          [:x_pos, :y_pos],
+          changeset,
+          &add_error(&2, &1, "x, y combination already taken")
+        )
+    end
   end
+
+  defp validate_unique_position(changeset), do: changeset
 end
