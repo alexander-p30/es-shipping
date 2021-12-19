@@ -5,10 +5,11 @@ defmodule EsShipping.Harbors.CommandsTest do
 
   alias EsShipping.Harbors.Commands
   alias EsShipping.Harbors.Commands.Create
+  alias EsShipping.Harbors.Commands.Get
   alias EsShipping.Harbors.Commands.Update
 
   setup_all do
-    create_command =
+    create =
       build(:create_harbor,
         id: Ecto.UUID.generate(),
         name: "Hamburg",
@@ -17,7 +18,7 @@ defmodule EsShipping.Harbors.CommandsTest do
         y_pos: 0
       )
 
-    update_command =
+    update =
       build(:update_harbor,
         name: "Bruges",
         is_active: true,
@@ -26,12 +27,14 @@ defmodule EsShipping.Harbors.CommandsTest do
         received_fields: [:name, :is_active, :x_pos, :y_pos]
       )
 
-    %{create_command: create_command, update_command: update_command}
+    get = build(:get_harbor)
+
+    %{create: create, update: update, get: get}
   end
 
   describe "validate/1 - create command" do
     test "return a valid create command changeset when all params are valid", ctx do
-      assert %Ecto.Changeset{valid?: true} = Commands.validate(ctx.create_command)
+      assert %Ecto.Changeset{valid?: true} = Commands.validate(ctx.create)
     end
 
     test "return an invalid create command changeset when required params are missing" do
@@ -47,32 +50,39 @@ defmodule EsShipping.Harbors.CommandsTest do
     end
 
     test "return an invalid create command changeset when x_pos is invalid", ctx do
-      command = %Create{ctx.create_command | x_pos: -1}
+      command = %Create{ctx.create | x_pos: -1}
 
       assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(command)
       assert %{x_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
     end
 
     test "return an invalid create command changeset when y_pos is invalid", ctx do
-      command = %Create{ctx.create_command | y_pos: -1}
+      command = %Create{ctx.create | y_pos: -1}
 
       assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(command)
       assert %{y_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
     end
 
     test "return an invalid changeset when x_pos and y_pos were already taken", ctx do
-      insert(:harbor_projection, Map.from_struct(ctx.create_command))
+      insert(:harbor_projection, Map.from_struct(ctx.create))
 
-      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(ctx.create_command)
+      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(ctx.create)
 
       message = ["x, y combination already taken"]
       assert %{x_pos: message, y_pos: message} == errors_on(changeset)
+    end
+
+    test "return a valid changeset when x_pos and y_pos were already taken by an inactive harbor",
+         ctx do
+      insert(:harbor_projection, ctx.create |> Map.from_struct() |> Map.put(:is_active, false))
+
+      assert %Ecto.Changeset{valid?: true} = Commands.validate(ctx.create)
     end
   end
 
   describe "validate/1 - update command" do
     test "return a valid update command changeset when all params are valid", ctx do
-      assert %Ecto.Changeset{valid?: true} = Commands.validate(ctx.update_command)
+      assert %Ecto.Changeset{valid?: true} = Commands.validate(ctx.update)
     end
 
     test "update command should only validate received fields" do
@@ -99,13 +109,39 @@ defmodule EsShipping.Harbors.CommandsTest do
       assert %{y_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
     end
 
-    test "return an invalid changeset when x_pos and y_pos were already taken", ctx do
-      insert(:harbor_projection, Map.from_struct(ctx.create_command))
+    test "return an invalid changeset when x_pos and y_pos were already taken by an active harbor",
+         ctx do
+      params = ctx.update |> Map.from_struct() |> Map.drop([:received_fields])
+      insert(:harbor_projection, params)
 
-      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(ctx.create_command)
+      assert %Ecto.Changeset{valid?: false} = changeset = Commands.validate(ctx.update)
 
       message = ["x, y combination already taken"]
       assert %{x_pos: message, y_pos: message} == errors_on(changeset)
+    end
+
+    test "return a valid changeset when x_pos and y_pos were already taken by an inactive harbor",
+         ctx do
+      params =
+        ctx.update
+        |> Map.from_struct()
+        |> Map.put(:is_active, false)
+        |> Map.drop([:received_fields])
+
+      insert(:harbor_projection, params)
+
+      assert %Ecto.Changeset{valid?: true} = Commands.validate(ctx.update)
+    end
+  end
+
+  describe "validate/1 - get command" do
+    test "return a valid get command when id is present", ctx do
+      assert %Ecto.Changeset{valid?: true} = Commands.validate(ctx.get)
+    end
+
+    test "return an invalid get command when id is missing or not a uuid" do
+      assert %Ecto.Changeset{valid?: false} = Commands.validate(%Get{})
+      assert %Ecto.Changeset{valid?: false} = Commands.validate(%Get{id: "some string"})
     end
   end
 end

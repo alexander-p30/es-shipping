@@ -4,6 +4,7 @@ defmodule EsShipping.CommandTest do
   import EsShipping.Factory
 
   alias EsShipping.Command
+  alias EsShipping.Harbor
 
   describe "validate/1" do
     test "return a command struct when the command values are valid" do
@@ -34,7 +35,8 @@ defmodule EsShipping.CommandTest do
           {build(:create_harbor, x_pos: -1), :x_pos_must_be_higher_than_0},
           {build(:create_harbor, y_pos: nil), :y_pos_must_be_higher_than_0},
           {build(:update_harbor, x_pos: -1), :x_pos_must_be_higher_than_0},
-          {build(:update_harbor, y_pos: nil), :y_pos_must_be_higher_than_0}
+          {build(:update_harbor, y_pos: nil), :y_pos_must_be_higher_than_0},
+          {build(:get_harbor, id: nil), :must_have_an_id}
         ],
         fn {invalid_command, descriptive_atom} ->
           assert descriptive_atom == invalid_command |> run_validation() |> Command.parse_error()
@@ -72,17 +74,28 @@ defmodule EsShipping.CommandTest do
              is_active: true,
              x_pos: 255,
              y_pos: 64
-           }, &build(:create_harbor, &1), &build(:harbor_created, &1)},
+           }, fn _ -> %Harbor{} end, &build(:create_harbor, &1), &build(:harbor_created, &1)},
           {%{
              id: Ecto.UUID.generate(),
              name: "updated harbor name",
              is_active: false,
              x_pos: 12_038,
              y_pos: 0
-           }, &build(:update_harbor, &1), &build(:harbor_updated, &1)}
+           }, fn _ -> %Harbor{} end, &build(:update_harbor, &1), &build(:harbor_updated, &1)},
+          {%{
+             id: Ecto.UUID.generate(),
+             name: "A harbor",
+             is_active: false,
+             x_pos: 123,
+             y_pos: 321
+           }, &build(:harbor, &1), &build(:get_harbor, &1), &build(:harbor_got, &1)}
         ],
-        fn {attrs, build_command_fn, build_event_fn} ->
-          assert build_event_fn.(attrs) == Command.to_event(build_command_fn.(attrs))
+        fn {attrs, build_aggregate_fn, build_command_fn, build_event_fn} ->
+          aggregate = build_aggregate_fn.(attrs)
+          command = build_command_fn.(attrs)
+          event = build_event_fn.(attrs)
+
+          assert event == Command.to_event(aggregate, command)
         end
       )
     end

@@ -11,17 +11,16 @@ defmodule EsShipping.Factory do
     factory
     |> build(attrs)
     |> Map.from_struct()
-    |> convert_to_json()
+    |> to_json()
     |> drop_unwanted_fields()
     |> apply_opts(opts)
   end
 
-  defp convert_to_json(%{} = map),
-    do: Map.new(map, fn {k, v} -> {convert_to_json(k), convert_to_json(v)} end)
-
-  defp convert_to_json(v) when is_boolean(v), do: v
-  defp convert_to_json(v) when is_atom(v), do: "#{v}"
-  defp convert_to_json(v), do: v
+  def to_json(v) when is_struct(v), do: to_json(Map.from_struct(v))
+  def to_json(%{} = map), do: Map.new(map, fn {k, v} -> {to_json(k), to_json(v)} end)
+  def to_json(v) when is_boolean(v), do: v
+  def to_json(v) when is_atom(v), do: "#{v}"
+  def to_json(v) when not is_tuple(v), do: v
 
   defp drop_unwanted_fields(data), do: Map.drop(data, [:received_fields])
 

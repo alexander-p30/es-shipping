@@ -6,9 +6,11 @@ defmodule EsShipping.Command do
 
   alias EsShipping.Command.{Errors, Events, Validations}
   alias EsShipping.Event
+  alias EsShipping.Harbor
   alias EsShipping.Harbors.Commands, as: HarborsCommands
 
   @type t() :: HarborsCommands.t()
+  @type aggregate() :: Harbor.t()
 
   @doc """
   Builds a command with the received parameters.
@@ -30,6 +32,6 @@ defmodule EsShipping.Command do
   @doc """
   Converts a command to its corresponding event.
   """
-  @spec to_event(command :: t()) :: Event.t()
-  def to_event(command), do: Events.from_command(command)
+  @spec to_event(aggregate :: aggregate(), command :: t()) :: Event.t()
+  def to_event(aggregate, command), do: Events.from_command(aggregate, command)
 end

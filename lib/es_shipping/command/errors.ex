@@ -10,7 +10,8 @@ defmodule EsShipping.Command.Errors do
     {Harbors, [:create, :update], :name, :must_have_name},
     {Harbors, [:create, :update], :is_active, :must_have_is_active},
     {Harbors, [:create, :update], :x_pos, :x_pos_must_be_higher_than_0},
-    {Harbors, [:create, :update], :y_pos, :y_pos_must_be_higher_than_0}
+    {Harbors, [:create, :update], :y_pos, :y_pos_must_be_higher_than_0},
+    {Harbors, :get, :id, :must_have_an_id}
   ]
 
   @field_errors @harbors_field_errors

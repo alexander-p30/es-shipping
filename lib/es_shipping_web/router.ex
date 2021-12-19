@@ -10,6 +10,6 @@ defmodule EsShippingWeb.Router do
   scope "/api/v1", EsShippingWeb do
     pipe_through :api
 
-    resources "/harbors", V1.HarborController, only: [:create, :update]
+    resources "/harbors", V1.HarborController, only: ~w(show create update)a
   end
 end

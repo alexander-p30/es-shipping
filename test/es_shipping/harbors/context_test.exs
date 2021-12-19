@@ -121,5 +121,35 @@ defmodule EsShipping.Harbors.ContextTest do
       assert {:error, :y_pos_must_be_higher_than_0} ==
                Context.update_harbor(%{"id" => params["id"], "y_pos" => -321})
     end
+
+    test "return error when id is not associated with any harbor" do
+      assert {:error, :harbor_not_found} == Context.update_harbor(%{"id" => Ecto.UUID.generate()})
+    end
+  end
+
+  describe "get_harbor/1" do
+    setup do
+      {:ok, harbor} =
+        CommandedApp.dispatch(
+          build(:create_harbor,
+            id: Ecto.UUID.generate(),
+            name: "Victoria",
+            is_active: true,
+            x_pos: 444,
+            y_pos: 888
+          ),
+          returning: :aggregate_state
+        )
+
+      %{harbor: harbor}
+    end
+
+    test "return harbor with requested id", %{harbor: harbor} do
+      assert {:ok, harbor} == Context.get_harbor(harbor.id)
+    end
+
+    test "return error when id is not associated with any harbor" do
+      assert {:error, :harbor_not_found} == Context.get_harbor(Ecto.UUID.generate())
+    end
   end
 end

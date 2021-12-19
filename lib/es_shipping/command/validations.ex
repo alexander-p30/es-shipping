@@ -7,9 +7,10 @@ defmodule EsShipping.Command.Validations do
   alias EsShipping.Command
   alias EsShipping.Harbors.Commands, as: HarborCommands
   alias EsShipping.Harbors.Commands.Create, as: CreateHarbor
+  alias EsShipping.Harbors.Commands.Get, as: GetHarbor
   alias EsShipping.Harbors.Commands.Update, as: UpdateHarbor
 
-  @harbor_commands [CreateHarbor, UpdateHarbor]
+  @harbor_commands [CreateHarbor, GetHarbor, UpdateHarbor]
 
   @spec validate(command :: Command.t()) :: {:ok, Command.t()} | {:error, Ecto.Changeset.t()}
   def validate(command) do

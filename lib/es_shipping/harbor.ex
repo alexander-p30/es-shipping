@@ -6,8 +6,10 @@ defmodule EsShipping.Harbor do
   alias EsShipping.Command
   alias EsShipping.Harbors.Commands
   alias EsShipping.Harbors.Commands.Create
+  alias EsShipping.Harbors.Commands.Get
   alias EsShipping.Harbors.Commands.Update
   alias EsShipping.Harbors.Events.Created
+  alias EsShipping.Harbors.Events.Got
   alias EsShipping.Harbors.Events.Updated
 
   @type t :: %__MODULE__{
@@ -18,25 +20,31 @@ defmodule EsShipping.Harbor do
           y_pos: integer() | nil
         }
 
-  @type harbor_command :: Commands.t()
-  @type harbor_event :: Created.t()
+  @type command :: Commands.t()
+  @type event :: Created.t() | Updated.t() | Got.t()
 
   @struct_fields ~w(id name x_pos y_pos is_active)a
 
   @derive {Jason.Encoder, only: @struct_fields}
   defstruct @struct_fields
 
-  @spec execute(t(), harbor_command()) :: harbor_event() | {:error, atom()}
-  def execute(%__MODULE__{id: nil}, %Create{} = command) do
-    do_execute(command)
-  end
+  @spec execute(t(), command()) :: event() | {:error, atom()}
+  def execute(%__MODULE__{id: nil} = aggregate, %Create{} = command),
+    do: do_execute(aggregate, command)
 
-  def execute(%__MODULE__{id: aggregate_id}, %Update{} = command)
-      when not is_nil(aggregate_id) and aggregate_id == command.id do
-    do_execute(command)
-  end
+  def execute(%__MODULE__{} = aggregate, %Update{} = command)
+      when not is_nil(aggregate.id) and aggregate.id == command.id,
+      do: do_execute(aggregate, command)
 
-  @spec apply(t(), harbor_event()) :: t()
+  def execute(%__MODULE__{}, %Update{}), do: {:error, :harbor_not_found}
+
+  def execute(%__MODULE__{} = aggregate, %Get{} = command)
+      when aggregate.id == command.id,
+      do: do_execute(aggregate, command)
+
+  def execute(%__MODULE__{}, %Get{}), do: {:error, :harbor_not_found}
+
+  @spec apply(t(), event()) :: t()
   def apply(%__MODULE__{} = harbor, %Created{} = event) do
     %__MODULE__{
       harbor
@@ -58,10 +66,12 @@ defmodule EsShipping.Harbor do
     }
   end
 
-  @spec do_execute(command :: harbor_command()) :: {:ok, harbor_event()} | {:error, atom()}
-  defp do_execute(command) do
+  def apply(%__MODULE__{} = harbor, %Got{}), do: harbor
+
+  @spec do_execute(aggregate :: t(), command :: command()) :: {:ok, event()} | {:error, atom()}
+  defp do_execute(aggregate, command) do
     case Command.validate(command) do
-      {:ok, command} -> Command.to_event(command)
+      {:ok, command} -> Command.to_event(aggregate, command)
       {:error, changeset} -> {:error, Command.parse_error(changeset)}
     end
   end

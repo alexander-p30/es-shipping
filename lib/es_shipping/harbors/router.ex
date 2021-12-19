@@ -3,9 +3,10 @@ defmodule EsShipping.Harbors.Router do
 
   alias EsShipping.Harbor
   alias EsShipping.Harbors.Commands.Create
+  alias EsShipping.Harbors.Commands.Get
   alias EsShipping.Harbors.Commands.Update
 
   identify(Harbor, by: :id)
 
-  dispatch([Create, Update], to: Harbor)
+  dispatch([Create, Get, Update], to: Harbor)
 end

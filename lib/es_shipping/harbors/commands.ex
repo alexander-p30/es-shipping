@@ -8,12 +8,14 @@ defmodule EsShipping.Harbors.Commands do
   import Ecto.Changeset
 
   alias EsShipping.Harbors.Commands.Create
+  alias EsShipping.Harbors.Commands.Get
   alias EsShipping.Harbors.Commands.Update
   alias EsShipping.Harbors.Repository
 
-  @type t() :: Create.t() | Update.t()
+  @type t() :: Create.t() | Update.t() | Get.t()
 
   @create_fields ~w(id name is_active x_pos y_pos)a
+  @get_fields ~w(id)a
 
   @primary_key false
   embedded_schema do
@@ -25,28 +27,39 @@ defmodule EsShipping.Harbors.Commands do
     field :x_pos, :integer
     field :y_pos, :integer
 
-    field :command, Ecto.Enum, values: ~w(create update)a
+    field :command, Ecto.Enum, values: ~w(create update get)a
   end
 
   @spec validate(command :: t()) :: Ecto.Changeset.t()
   def validate(%Create{} = command) do
-    params = Map.from_struct(command)
-
-    %__MODULE__{}
-    |> cast(params, @create_fields)
-    |> put_command(command)
-    |> validate_required(@create_fields)
+    command
+    |> init_changeset(@create_fields)
     |> validate_common_fields()
   end
 
   def validate(%Update{received_fields: [_ | _]} = command) do
+    command
+    |> init_changeset(command.received_fields)
+    |> validate_common_fields()
+  end
+
+  def validate(%Get{} = command), do: init_changeset(command, @get_fields)
+
+  @spec init_changeset(command :: t(), cast_fields :: list(atom())) :: Ecto.Changeset.t()
+  defp init_changeset(command, cast_fields), do: init_changeset(command, cast_fields, cast_fields)
+
+  @spec init_changeset(
+          command :: t(),
+          cast_fields :: list(atom()),
+          required_fields :: list(atom())
+        ) :: Ecto.Changeset.t()
+  defp init_changeset(command, cast_fields, required_fields) do
     params = Map.from_struct(command)
 
     %__MODULE__{}
-    |> cast(params, command.received_fields)
-    |> validate_required(command.received_fields)
+    |> cast(params, cast_fields)
+    |> validate_required(required_fields)
     |> put_command(command)
-    |> validate_common_fields()
   end
 
   @spec validate_common_fields(chagneset :: Ecto.Changeset.t()) :: Ecto.Changeset.t()
@@ -59,11 +72,12 @@ defmodule EsShipping.Harbors.Commands do
 
   @spec put_command(changeset :: Ecto.Changeset.t(), command :: t()) :: Ecto.Changeset.t()
   defp put_command(changeset, %Create{}), do: put_change(changeset, :command, :create)
+  defp put_command(changeset, %Get{}), do: put_change(changeset, :command, :get)
   defp put_command(changeset, %Update{}), do: put_change(changeset, :command, :update)
 
   @spec validate_unique_position(changeset :: Ecto.Changeset.t()) :: Ecto.Changeset.t()
   defp validate_unique_position(%Ecto.Changeset{valid?: true} = changeset) do
-    [x_pos: get_change(changeset, :x_pos), y_pos: get_change(changeset, :y_pos)]
+    [x_pos: get_change(changeset, :x_pos), y_pos: get_change(changeset, :y_pos), is_active: true]
     |> Repository.get_by()
     |> case do
       [] ->

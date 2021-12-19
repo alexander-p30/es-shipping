@@ -3,8 +3,10 @@ defmodule EsShipping.Factory.Harbors do
     quote do
       alias EsShipping.Harbor
       alias EsShipping.Harbors.Commands.Create
+      alias EsShipping.Harbors.Commands.Get
       alias EsShipping.Harbors.Commands.Update
       alias EsShipping.Harbors.Events.Created
+      alias EsShipping.Harbors.Events.Got
       alias EsShipping.Harbors.Events.Updated
       alias EsShipping.Harbors.Projection
 
@@ -70,6 +72,21 @@ defmodule EsShipping.Factory.Harbors do
           is_active: true,
           x_pos: 123,
           y_pos: 987
+        }
+
+        merge_attributes(event, attrs)
+      end
+
+      def get_harbor_factory(attrs),
+        do: merge_attributes(%Get{id: Ecto.UUID.generate()}, Map.take(attrs, [:id]))
+
+      def harbor_got_factory(attrs) do
+        event = %Got{
+          id: Ecto.UUID.generate(),
+          name: "some harbor",
+          is_active: false,
+          x_pos: 92_347,
+          y_pos: 0
         }
 
         merge_attributes(event, attrs)

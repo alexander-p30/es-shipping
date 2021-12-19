@@ -21,12 +21,16 @@ defmodule EsShipping.HarborTest do
     y_pos: 2833
   }
 
+  @get_attrs @create_attrs
+
   setup_all do
     %{
       create_command: build(:create_harbor, @create_attrs),
       create_event: build(:harbor_created, @create_attrs),
       update_command: build(:update_harbor, @update_attrs),
-      update_event: build(:harbor_updated, @update_attrs)
+      update_event: build(:harbor_updated, @update_attrs),
+      get_command: build(:get_harbor, id: @get_attrs.id),
+      get_event: build(:harbor_got, @get_attrs)
     }
   end
 
@@ -58,43 +62,54 @@ defmodule EsShipping.HarborTest do
                Harbor.execute(%Harbor{id: ctx.update_command.id}, ctx.update_command)
     end
 
-    test "raise when identity field is nil and command is update harbor", ctx do
-      assert_raise FunctionClauseError, fn ->
-        Harbor.execute(%Harbor{id: nil}, ctx.update_command)
-      end
+    test "return harbor not found when identity does not match in update", ctx do
+      put_in(ctx.update_command.id, Ecto.UUID.generate())
+
+      assert {:error, :harbor_not_found} ==
+               Harbor.execute(%Harbor{id: Ecto.UUID.generate()}, ctx.update_command)
+    end
+
+    test "return harbor got event with requested id when get command is valid", ctx do
+      Harbor.execute(%Harbor{}, ctx.create_command)
+      updated_aggregate = build(:harbor, @create_attrs)
+
+      assert ctx.get_event == Harbor.execute(updated_aggregate, ctx.get_command)
+    end
+
+    test "return harbor not found error when get command is invalid", ctx do
+      Harbor.execute(%Harbor{}, ctx.create_command)
+      updated_aggregate = build(:harbor, @create_attrs)
+
+      assert {:error, :harbor_not_found} ==
+               Harbor.execute(updated_aggregate, build(:get_harbor, id: Ecto.UUID.generate()))
     end
   end
 
   describe "apply/2" do
-    test "return a mutated harbor struct with created event attributes ", ctx do
-      mutated_harbor = %Harbor{
-        id: ctx.create_event.id,
-        name: ctx.create_event.name,
-        is_active: ctx.create_event.is_active,
-        x_pos: ctx.create_event.x_pos,
-        y_pos: ctx.create_event.y_pos
-      }
+    test "return a mutated harbor struct with created event attributes", ctx do
+      mutated_harbor = build(:harbor, @create_attrs)
 
       assert mutated_harbor == Harbor.apply(%Harbor{}, ctx.create_event)
-      assert mutated_harbor == Harbor.apply(%Harbor{name: ctx.create_event}, ctx.create_event)
     end
 
-    test "return a mutated harbor struct with updated event attributes ", ctx do
-      mutated_harbor = %Harbor{
-        id: ctx.update_event.id,
-        name: ctx.update_event.name,
-        is_active: ctx.update_event.is_active,
-        x_pos: ctx.update_event.x_pos,
-        y_pos: ctx.update_event.y_pos
-      }
+    test "return a mutated harbor struct with updated event attributes", ctx do
+      mutated_harbor = build(:harbor, @update_attrs)
 
       assert mutated_harbor == Harbor.apply(%Harbor{id: ctx.update_event.id}, ctx.update_event)
+    end
 
-      assert mutated_harbor ==
-               Harbor.apply(
-                 %Harbor{id: ctx.update_event.id, name: ctx.update_event.name},
-                 ctx.update_event
-               )
+    test "return a non-mutated harbor when event is got" do
+      unchanged_harbor = build(:harbor, @create_attrs)
+
+      got_event =
+        build(:harbor_got,
+          id: @create_attrs.id,
+          name: "Some other name",
+          x_pos: 999,
+          y_pos: 1000
+        )
+
+      assert unchanged_harbor == Harbor.apply(unchanged_harbor, got_event)
     end
   end
 end
