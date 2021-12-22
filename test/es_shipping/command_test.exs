@@ -23,11 +23,11 @@ defmodule EsShipping.CommandTest do
   describe "parse_error/1" do
     test "raise when changeset is valid" do
       assert_raise ArgumentError, "Only invalid changesets can be parsed for errors.", fn ->
-        Command.parse_error(%Ecto.Changeset{valid?: true})
+        Command.parse_errors(%Ecto.Changeset{valid?: true})
       end
     end
 
-    test "convert changeset error of an invalid field value to a descriptive atom" do
+    test "convert changeset error of an invalid field value to a descriptive atom list" do
       Enum.each(
         [
           {build(:create_harbor, name: nil), :must_have_name},
@@ -39,20 +39,21 @@ defmodule EsShipping.CommandTest do
           {build(:get_harbor, id: nil), :must_have_an_id}
         ],
         fn {invalid_command, descriptive_atom} ->
-          assert descriptive_atom == invalid_command |> run_validation() |> Command.parse_error()
+          assert [descriptive_atom] ==
+                   invalid_command |> run_validation() |> Command.parse_errors()
         end
       )
     end
 
-    test "always convert first changeset error of an invalid field value to a descriptive atom " <>
-           "when there are multiple errors" do
+    test "convert all changeset errors to a descriptive atom list when there are multiple errors" do
       changeset_with_multiple_errors =
         :create_harbor |> build(name: nil, is_active: nil) |> run_validation()
 
       assert %{name: ["can't be blank"], is_active: ["can't be blank"]} ==
                errors_on(changeset_with_multiple_errors)
 
-      assert :must_have_name == Command.parse_error(changeset_with_multiple_errors)
+      assert [:must_have_is_active, :must_have_name] ==
+               Command.parse_errors(changeset_with_multiple_errors)
 
       changeset_with_multiple_errors =
         :create_harbor |> build(is_active: nil, x_pos: -1) |> run_validation()
@@ -60,7 +61,29 @@ defmodule EsShipping.CommandTest do
       assert %{is_active: ["can't be blank"], x_pos: ["must be greater than or equal to 0"]} ==
                errors_on(changeset_with_multiple_errors)
 
-      assert :x_pos_must_be_higher_than_0 == Command.parse_error(changeset_with_multiple_errors)
+      assert [:x_pos_must_be_higher_than_0, :must_have_is_active] ==
+               Command.parse_errors(changeset_with_multiple_errors)
+
+      changeset_with_multiple_errors =
+        :create_harbor
+        |> build(name: nil, is_active: nil, x_pos: -1, y_pos: -1)
+        |> run_validation()
+
+      assert %{
+               name: ["can't be blank"],
+               is_active: ["can't be blank"],
+               x_pos: ["must be greater than or equal to 0"],
+               y_pos: ["must be greater than or equal to 0"]
+             } ==
+               errors_on(changeset_with_multiple_errors)
+
+      assert [
+               :y_pos_must_be_higher_than_0,
+               :x_pos_must_be_higher_than_0,
+               :must_have_is_active,
+               :must_have_name
+             ] ==
+               Command.parse_errors(changeset_with_multiple_errors)
     end
   end
 

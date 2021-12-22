@@ -30,7 +30,7 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
     test "return an error json when name is invalid", ctx do
       invalid_params = Map.put(ctx.params, "name", nil)
 
-      assert %{"error" => "must_have_name", "entity" => "harbor"} =
+      assert %{"errors" => ["must_have_name"], "entity" => "harbor"} =
                ctx.conn |> post(@create_url, invalid_params) |> json_response(422)
     end
   end
@@ -99,7 +99,7 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
     end
 
     test "return not found error when id is not associated with any harbor", ctx do
-      assert %{"entity" => "harbor", "error" => "harbor_not_found"} ==
+      assert %{"entity" => "harbor", "errors" => "harbor_not_found"} ==
                ctx.conn |> get(@show_url <> Ecto.UUID.generate()) |> json_response(404)
     end
   end

@@ -26,8 +26,8 @@ defmodule EsShipping.Command do
   @doc """
   Converts a changeset's first error to an atom message.
   """
-  @spec parse_error(changeset :: Ecto.Changeset.t()) :: atom()
-  defdelegate parse_error(changeset), to: Errors
+  @spec parse_errors(changeset :: Ecto.Changeset.t()) :: list(atom())
+  def parse_errors(changeset), do: Errors.parse(changeset)
 
   @doc """
   Converts a command to its corresponding event.

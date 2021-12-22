@@ -20,7 +20,10 @@ defmodule EsShipping.Harbor do
           y_pos: integer() | nil
         }
 
+  # TODO: consider changing this error format
+  @typep error :: {:validation, list(atom())} | {:internal, atom()}
   @type command :: Commands.t()
+  @type command_execution :: {:ok, t()} | {:error, error()}
   @type event :: Created.t() | Updated.t() | Got.t()
 
   @struct_fields ~w(id name x_pos y_pos is_active)a
@@ -28,7 +31,7 @@ defmodule EsShipping.Harbor do
   @derive {Jason.Encoder, only: @struct_fields}
   defstruct @struct_fields
 
-  @spec execute(t(), command()) :: event() | {:error, atom()}
+  @spec execute(t(), command()) :: event() | {:error, error()}
   def execute(%__MODULE__{id: nil} = aggregate, %Create{} = command),
     do: do_execute(aggregate, command)
 
@@ -36,13 +39,13 @@ defmodule EsShipping.Harbor do
       when not is_nil(aggregate.id) and aggregate.id == command.id,
       do: do_execute(aggregate, command)
 
-  def execute(%__MODULE__{}, %Update{}), do: {:error, :harbor_not_found}
+  def execute(%__MODULE__{}, %Update{}), do: {:error, {:internal, :harbor_not_found}}
 
   def execute(%__MODULE__{} = aggregate, %Get{} = command)
       when aggregate.id == command.id,
       do: do_execute(aggregate, command)
 
-  def execute(%__MODULE__{}, %Get{}), do: {:error, :harbor_not_found}
+  def execute(%__MODULE__{}, %Get{}), do: {:error, {:internal, :harbor_not_found}}
 
   @spec apply(t(), event()) :: t()
   def apply(%__MODULE__{} = harbor, %Created{} = event) do
@@ -68,11 +71,11 @@ defmodule EsShipping.Harbor do
 
   def apply(%__MODULE__{} = harbor, %Got{}), do: harbor
 
-  @spec do_execute(aggregate :: t(), command :: command()) :: {:ok, event()} | {:error, atom()}
+  @spec do_execute(aggregate :: t(), command :: command()) :: {:ok, event()} | {:error, error()}
   defp do_execute(aggregate, command) do
     case Command.validate(command) do
       {:ok, command} -> Command.to_event(aggregate, command)
-      {:error, changeset} -> {:error, Command.parse_error(changeset)}
+      {:error, changeset} -> {:error, {:validation, Command.parse_errors(changeset)}}
     end
   end
 end

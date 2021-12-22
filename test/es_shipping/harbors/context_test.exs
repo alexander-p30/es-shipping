@@ -42,22 +42,22 @@ defmodule EsShipping.Harbors.ContextTest do
     end
 
     test "return error when name is invalid", %{params: params} do
-      assert {:error, :must_have_name} ==
+      assert {:error, {:validation, [:must_have_name]}} ==
                params |> Map.put("name", nil) |> Context.create_harbor()
     end
 
     test "return error when active status is invalid", %{params: params} do
-      assert {:error, :must_have_is_active} ==
+      assert {:error, {:validation, [:must_have_is_active]}} ==
                params |> Map.put("is_active", nil) |> Context.create_harbor()
     end
 
     test "return error when x_pos is invalid", %{params: params} do
-      assert {:error, :x_pos_must_be_higher_than_0} ==
+      assert {:error, {:validation, [:x_pos_must_be_higher_than_0]}} ==
                params |> Map.put("x_pos", -40) |> Context.create_harbor()
     end
 
     test "return error when y_pos is invalid", %{params: params} do
-      assert {:error, :y_pos_must_be_higher_than_0} ==
+      assert {:error, {:validation, [:y_pos_must_be_higher_than_0]}} ==
                params |> Map.put("y_pos", -1_273_182) |> Context.create_harbor()
     end
   end
@@ -103,27 +103,28 @@ defmodule EsShipping.Harbors.ContextTest do
     end
 
     test "return error when name is invalid", %{params: params} do
-      assert {:error, :must_have_name} ==
+      assert {:error, {:validation, [:must_have_name]}} ==
                Context.update_harbor(%{"id" => params["id"], "name" => nil})
     end
 
     test "return error when active status is invalid", %{params: params} do
-      assert {:error, :must_have_is_active} ==
+      assert {:error, {:validation, [:must_have_is_active]}} ==
                Context.update_harbor(%{"id" => params["id"], "is_active" => nil})
     end
 
     test "return error when x_pos is invalid", %{params: params} do
-      assert {:error, :x_pos_must_be_higher_than_0} ==
+      assert {:error, {:validation, [:x_pos_must_be_higher_than_0]}} ==
                Context.update_harbor(%{"id" => params["id"], "x_pos" => -3})
     end
 
     test "return error when y_pos is invalid", %{params: params} do
-      assert {:error, :y_pos_must_be_higher_than_0} ==
+      assert {:error, {:validation, [:y_pos_must_be_higher_than_0]}} ==
                Context.update_harbor(%{"id" => params["id"], "y_pos" => -321})
     end
 
     test "return error when id is not associated with any harbor" do
-      assert {:error, :harbor_not_found} == Context.update_harbor(%{"id" => Ecto.UUID.generate()})
+      assert {:error, {:internal, :harbor_not_found}} ==
+               Context.update_harbor(%{"id" => Ecto.UUID.generate()})
     end
   end
 
@@ -149,7 +150,8 @@ defmodule EsShipping.Harbors.ContextTest do
     end
 
     test "return error when id is not associated with any harbor" do
-      assert {:error, :harbor_not_found} == Context.get_harbor(Ecto.UUID.generate())
+      assert {:error, {:internal, :harbor_not_found}} ==
+               Context.get_harbor(Ecto.UUID.generate())
     end
   end
 end

@@ -27,7 +27,7 @@ defmodule EsShippingWeb do
       defp send_json(conn, status, body, details \\ [])
 
       defp send_json(conn, status, body, details) when status >= 400 do
-        content = details |> Map.new(& &1) |> Map.merge(%{error: body})
+        content = details |> Map.new() |> Map.merge(%{errors: body})
 
         conn
         |> put_resp_header("content-type", "application/json")

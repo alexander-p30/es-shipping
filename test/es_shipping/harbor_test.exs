@@ -41,7 +41,9 @@ defmodule EsShipping.HarborTest do
 
     test "return an error atom when create harbor command is invalid", ctx do
       ctx = put_in(ctx.create_command.name, nil)
-      assert {:error, :must_have_name} == Harbor.execute(%Harbor{}, ctx.create_command)
+
+      assert {:error, {:validation, [:must_have_name]}} ==
+               Harbor.execute(%Harbor{}, ctx.create_command)
     end
 
     test "raise when identity field is not nil and command is create harbor", ctx do
@@ -58,14 +60,14 @@ defmodule EsShipping.HarborTest do
     test "return an error atom when update harbor command is invalid", ctx do
       ctx = put_in(ctx.update_command.name, nil)
 
-      assert {:error, :must_have_name} ==
+      assert {:error, {:validation, [:must_have_name]}} ==
                Harbor.execute(%Harbor{id: ctx.update_command.id}, ctx.update_command)
     end
 
     test "return harbor not found when identity does not match in update", ctx do
       put_in(ctx.update_command.id, Ecto.UUID.generate())
 
-      assert {:error, :harbor_not_found} ==
+      assert {:error, {:internal, :harbor_not_found}} ==
                Harbor.execute(%Harbor{id: Ecto.UUID.generate()}, ctx.update_command)
     end
 
@@ -80,7 +82,7 @@ defmodule EsShipping.HarborTest do
       Harbor.execute(%Harbor{}, ctx.create_command)
       updated_aggregate = build(:harbor, @create_attrs)
 
-      assert {:error, :harbor_not_found} ==
+      assert {:error, {:internal, :harbor_not_found}} ==
                Harbor.execute(updated_aggregate, build(:get_harbor, id: Ecto.UUID.generate()))
     end
   end

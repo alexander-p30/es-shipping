@@ -11,19 +11,16 @@ defmodule EsShipping.Harbors.Context do
   alias EsShipping.Harbors.Commands.Get
   alias EsShipping.Harbors.Commands.Update
 
-  @typep command_execution :: {:ok, Harbor.t()} | {:error, atom()}
-
-  @spec create_harbor(params :: map()) :: command_execution()
+  @spec create_harbor(params :: map()) :: Harbor.command_execution()
   def create_harbor(params), do: build_and_dispatch(Create, params)
 
-  @spec update_harbor(params :: map()) :: command_execution()
+  @spec update_harbor(params :: map()) :: Harbor.command_execution()
   def update_harbor(params), do: build_and_dispatch(Update, params)
 
-  @spec get_harbor(id :: Ecto.UUID.t()) :: command_execution()
+  @spec get_harbor(id :: Ecto.UUID.t()) :: Harbor.command_execution()
   def get_harbor(id), do: build_and_dispatch(Get, %{id: id})
 
-  @spec build_and_dispatch(command :: module(), params :: map()) ::
-          {:ok, Harbor.t()} | {:error, atom()}
+  @spec build_and_dispatch(command :: module(), params :: map()) :: Harbor.command_execution()
   defp build_and_dispatch(command, params) do
     params
     |> adjust_params()
