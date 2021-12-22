@@ -33,69 +33,101 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
       assert %{"errors" => ["must_have_name"], "entity" => "harbor"} =
                ctx.conn |> post(@create_url, invalid_params) |> json_response(422)
     end
+
+    test "return an error json with multiple errors when params are invalid", ctx do
+      invalid_params = %{}
+
+      assert %{
+               "errors" => [
+                 "y_pos_must_be_higher_than_0",
+                 "x_pos_must_be_higher_than_0",
+                 "must_have_is_active",
+                 "must_have_name"
+               ],
+               "entity" => "harbor"
+             } = ctx.conn |> post(@create_url, invalid_params) |> json_response(422)
+    end
   end
 
   describe "PUT /harbors/:id/" do
-    setup do
+    setup %{conn: conn} do
+      create_params = json_params_for(:create_harbor, name: "Salvador", is_active: false)
+      %{"id" => harbor_id} = conn |> post(@create_url, create_params) |> json_response(201)
+
       %{
-        create_params: json_params_for(:create_harbor, name: "Salvador", is_active: false),
-        update_params: json_params_for(:update_harbor, name: "Porto Alegre", x_pos: 400, y_pos: 0)
+        id: harbor_id,
+        update_params:
+          json_params_for(:update_harbor,
+            name: "Porto Alegre",
+            x_pos: 400,
+            y_pos: 0
+          )
       }
     end
 
     test "return a harbor json with updated fields when params are valid", ctx do
       %{"name" => name, "is_active" => is_active, "x_pos" => x_pos, "y_pos" => y_pos} =
-        ctx.create_params
-
-      assert %{
-               "id" => id,
-               "name" => ^name,
-               "is_active" => ^is_active,
-               "x_pos" => ^x_pos,
-               "y_pos" => ^y_pos
-             } = ctx.conn |> post(@create_url, ctx.create_params) |> json_response(201)
-
-      assert Ecto.UUID.cast!(id)
-
-      %{"name" => name, "is_active" => is_active, "x_pos" => x_pos, "y_pos" => y_pos} =
         ctx.update_params
 
       assert %{
-               "id" => id,
+               "id" => ctx.id,
                "name" => name,
                "is_active" => is_active,
                "x_pos" => x_pos,
                "y_pos" => y_pos
-             } == ctx.conn |> put(@update_url <> id, ctx.update_params) |> json_response(201)
+             } == ctx.conn |> put(@update_url <> ctx.id, ctx.update_params) |> json_response(201)
+    end
+
+    test "return an error json with multiple errors when params are invalid", ctx do
+      invalid_params = %{
+        "id" => ctx.id,
+        "name" => nil,
+        "is_active" => nil,
+        "x_pos" => -1,
+        "y_pos" => -1
+      }
+
+      assert %{
+               "errors" => [
+                 "y_pos_must_be_higher_than_0",
+                 "x_pos_must_be_higher_than_0",
+                 "must_have_is_active",
+                 "must_have_name"
+               ],
+               "entity" => "harbor"
+             } = ctx.conn |> put(@update_url <> ctx.id, invalid_params) |> json_response(422)
+    end
+
+    test "return not found when id is not associated with any harbor", ctx do
+      assert %{"errors" => "harbor_not_found", "entity" => "harbor"} =
+               ctx.conn
+               |> put(@update_url <> Ecto.UUID.generate(), %{})
+               |> json_response(404)
     end
   end
 
   describe "GET /harbors/:id/" do
-    setup do
-      %{create_params: json_params_for(:create_harbor, name: "Salvador", is_active: false)}
+    setup %{conn: conn} do
+      harbor_attrs =
+        :create_harbor |> build(name: "Salvador", is_active: false) |> Map.from_struct()
+
+      %{"id" => harbor_id} =
+        conn
+        |> post(@create_url, json_params_for(:create_harbor, harbor_attrs))
+        |> json_response(201)
+
+      %{harbor: Map.put(harbor_attrs, :id, harbor_id)}
     end
 
-    test "return a harbor json with updated fields when params are valid", ctx do
-      %{"name" => name, "is_active" => is_active, "x_pos" => x_pos, "y_pos" => y_pos} =
-        ctx.create_params
-
+    test "return a harbor json with the requested id", ctx do
       assert %{
-               "id" => id,
-               "name" => ^name,
-               "is_active" => ^is_active,
-               "x_pos" => ^x_pos,
-               "y_pos" => ^y_pos
-             } = ctx.conn |> post(@create_url, ctx.create_params) |> json_response(201)
-
-      assert Ecto.UUID.cast!(id)
-
-      assert %{
-               "id" => id,
-               "name" => name,
-               "is_active" => is_active,
-               "x_pos" => x_pos,
-               "y_pos" => y_pos
-             } == ctx.conn |> get(@show_url <> id) |> json_response(201)
+               "id" => ctx.harbor.id,
+               "name" => ctx.harbor.name,
+               "is_active" => ctx.harbor.is_active,
+               "x_pos" => ctx.harbor.x_pos,
+               "y_pos" => ctx.harbor.y_pos
+             } ==
+               ctx.conn |> get(@show_url <> ctx.harbor.id) |> json_response(201)
     end
 
     test "return not found error when id is not associated with any harbor", ctx do

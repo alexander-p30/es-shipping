@@ -37,7 +37,7 @@ defmodule EsShipping.Harbors.Commands do
     |> validate_common_fields()
   end
 
-  def validate(%Update{received_fields: [_ | _]} = command) do
+  def validate(%Update{received_fields: fields} = command) when is_list(fields) do
     command
     |> init_changeset(command.received_fields)
     |> validate_common_fields()
