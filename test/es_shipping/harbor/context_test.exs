@@ -1,12 +1,12 @@
-defmodule EsShipping.Harbors.ContextTest do
+defmodule EsShipping.Harbor.ContextTest do
   use EsShipping.DataCase, async: false
 
   import EsShipping.Factory
 
   alias EsShipping.EventSourcing.CommandedApp
   alias EsShipping.Harbor
-  alias EsShipping.Harbors.Context
-  alias EsShipping.Harbors.Projection
+  alias EsShipping.Harbor.Context
+  alias EsShipping.Harbor.Projection
   alias EsShipping.Repo
 
   describe "create_harbor/1" do

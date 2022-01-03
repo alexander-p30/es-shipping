@@ -3,5 +3,5 @@ defmodule EsShipping.EventSourcing.CommandedApp do
 
   use Commanded.Application, otp_app: :es_shipping
 
-  router(EsShipping.Harbors.Router)
+  router(EsShipping.Harbor.Router)
 end

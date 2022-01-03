@@ -1,4 +1,4 @@
-defmodule EsShipping.Harbors.Projection do
+defmodule EsShipping.Harbor.Projection do
   @moduledoc false
 
   use Ecto.Schema

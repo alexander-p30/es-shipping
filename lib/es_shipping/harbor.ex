@@ -4,12 +4,12 @@ defmodule EsShipping.Harbor do
   """
 
   alias EsShipping.Command
-  alias EsShipping.Harbors.Commands.Create
-  alias EsShipping.Harbors.Commands.Get
-  alias EsShipping.Harbors.Commands.Update
-  alias EsShipping.Harbors.Events.Created
-  alias EsShipping.Harbors.Events.Got
-  alias EsShipping.Harbors.Events.Updated
+  alias EsShipping.Harbor.Commands.Create
+  alias EsShipping.Harbor.Commands.Get
+  alias EsShipping.Harbor.Commands.Update
+  alias EsShipping.Harbor.Events.Created
+  alias EsShipping.Harbor.Events.Got
+  alias EsShipping.Harbor.Events.Updated
 
   @type t :: %__MODULE__{
           id: Ecto.UUID.t() | nil,

@@ -1,4 +1,4 @@
-defmodule EsShipping.Harbors.Events.Updated do
+defmodule EsShipping.Harbor.Events.Got do
   @moduledoc false
 
   @type t :: %__MODULE__{

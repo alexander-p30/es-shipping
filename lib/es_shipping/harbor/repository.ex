@@ -1,11 +1,11 @@
-defmodule EsShipping.Harbors.Repository do
+defmodule EsShipping.Harbor.Repository do
   @moduledoc """
   Read model fetching queries.
   """
 
   import Ecto.Query
 
-  alias EsShipping.Harbors.Projection
+  alias EsShipping.Harbor.Projection
   alias EsShipping.Repo
 
   @spec get_by(fields :: Keyword.t() | map()) :: list(Projection.t())

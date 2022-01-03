@@ -1,10 +1,10 @@
-defmodule EsShipping.Harbors.Commands.CreateTest do
+defmodule EsShipping.Harbor.Commands.CreateTest do
   use EsShipping.DataCase, async: false
 
   import EsShipping.Factory
 
   alias EsShipping.Command
-  alias EsShipping.Harbors.Commands.Create
+  alias EsShipping.Harbor.Commands.Create
 
   describe "new/1" do
     test "return a create command struct with a generated id" do

@@ -1,4 +1,4 @@
-defmodule EsShipping.Harbors.Context do
+defmodule EsShipping.Harbor.Context do
   @moduledoc """
   Holds functions for manipulating harbors.
   This context can create, update, and delete
@@ -7,9 +7,9 @@ defmodule EsShipping.Harbors.Context do
 
   alias EsShipping.EventSourcing.CommandedApp
   alias EsShipping.Harbor
-  alias EsShipping.Harbors.Commands.Create
-  alias EsShipping.Harbors.Commands.Get
-  alias EsShipping.Harbors.Commands.Update
+  alias EsShipping.Harbor.Commands.Create
+  alias EsShipping.Harbor.Commands.Get
+  alias EsShipping.Harbor.Commands.Update
 
   @spec create_harbor(params :: map()) :: Harbor.command_execution()
   def create_harbor(params), do: build_and_dispatch(Create, params)

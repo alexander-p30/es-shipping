@@ -7,7 +7,7 @@ defmodule EsShipping.EventSourcing.Supervisor do
   use Supervisor
 
   alias EsShipping.EventSourcing.CommandedApp
-  alias EsShipping.Harbors.Projector, as: HarborProjector
+  alias EsShipping.Harbor.Projector, as: HarborProjector
 
   def start_link(init_arg) do
     Supervisor.start_link(__MODULE__, init_arg, name: __MODULE__)

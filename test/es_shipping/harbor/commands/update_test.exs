@@ -1,10 +1,10 @@
-defmodule EsShipping.Harbors.Commands.UpdateTest do
+defmodule EsShipping.Harbor.Commands.UpdateTest do
   use EsShipping.DataCase, async: false
 
   import EsShipping.Factory
 
   alias EsShipping.Command
-  alias EsShipping.Harbors.Commands.Update
+  alias EsShipping.Harbor.Commands.Update
 
   describe "new/1" do
     setup do

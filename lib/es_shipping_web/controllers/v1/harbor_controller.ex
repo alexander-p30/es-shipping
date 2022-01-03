@@ -2,7 +2,7 @@ defmodule EsShippingWeb.Controllers.V1.HarborController do
   use EsShippingWeb, :controller
 
   alias EsShipping.Harbor
-  alias EsShipping.Harbors.Context
+  alias EsShipping.Harbor.Context
 
   def show(conn, params) do
     params

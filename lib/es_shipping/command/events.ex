@@ -6,12 +6,12 @@ defmodule EsShipping.Command.Events do
   alias EsShipping.Command
   alias EsShipping.Event
 
-  alias EsShipping.Harbors.Commands.Create, as: CH
-  alias EsShipping.Harbors.Commands.Get, as: GH
-  alias EsShipping.Harbors.Commands.Update, as: UH
-  alias EsShipping.Harbors.Events.Created, as: HC
-  alias EsShipping.Harbors.Events.Got, as: HG
-  alias EsShipping.Harbors.Events.Updated, as: HU
+  alias EsShipping.Harbor.Commands.Create, as: CH
+  alias EsShipping.Harbor.Commands.Get, as: GH
+  alias EsShipping.Harbor.Commands.Update, as: UH
+  alias EsShipping.Harbor.Events.Created, as: HC
+  alias EsShipping.Harbor.Events.Got, as: HG
+  alias EsShipping.Harbor.Events.Updated, as: HU
 
   @spec from_command(aggregate :: Command.aggregate(), command :: Command.t()) :: Event.t()
   def from_command(_, %CH{} = cmd),

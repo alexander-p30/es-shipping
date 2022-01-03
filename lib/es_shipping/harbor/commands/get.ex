@@ -1,4 +1,4 @@
-defmodule EsShipping.Harbors.Commands.Get do
+defmodule EsShipping.Harbor.Commands.Get do
   @moduledoc false
   use Ecto.Schema
 
@@ -15,11 +15,11 @@ defmodule EsShipping.Harbors.Commands.Get do
   def new(%{id: id}), do: %__MODULE__{id: id}
 end
 
-defimpl EsShipping.Command.Validation, for: EsShipping.Harbors.Commands.Get do
+defimpl EsShipping.Command.Validation, for: EsShipping.Harbor.Commands.Get do
   import Ecto.Changeset
 
   alias Ecto.Changeset
-  alias EsShipping.Harbors.Commands.Get
+  alias EsShipping.Harbor.Commands.Get
 
   @fields ~w(id)a
 

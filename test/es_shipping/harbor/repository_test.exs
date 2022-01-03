@@ -1,9 +1,9 @@
-defmodule EsShipping.Harbors.RepositoryTest do
+defmodule EsShipping.Harbor.RepositoryTest do
   use EsShipping.DataCase, async: false
 
   import EsShipping.Factory
 
-  alias EsShipping.Harbors.Repository
+  alias EsShipping.Harbor.Repository
 
   describe "get_by/1" do
     setup do

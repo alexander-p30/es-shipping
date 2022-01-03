@@ -1,4 +1,4 @@
-defmodule EsShipping.Harbors.Events.Created do
+defmodule EsShipping.Harbor.Events.Created do
   @moduledoc """
   Events emitted when harbors are created.
   """

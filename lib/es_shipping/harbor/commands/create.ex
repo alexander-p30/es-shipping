@@ -1,4 +1,4 @@
-defmodule EsShipping.Harbors.Commands.Create do
+defmodule EsShipping.Harbor.Commands.Create do
   @moduledoc false
   use Ecto.Schema
 
@@ -35,12 +35,12 @@ defmodule EsShipping.Harbors.Commands.Create do
   end
 end
 
-defimpl EsShipping.Command.Validation, for: EsShipping.Harbors.Commands.Create do
+defimpl EsShipping.Command.Validation, for: EsShipping.Harbor.Commands.Create do
   import Ecto.Changeset
 
   alias Ecto.Changeset
-  alias EsShipping.Harbors.Commands.Create
-  alias EsShipping.Harbors.Repository
+  alias EsShipping.Harbor.Commands.Create
+  alias EsShipping.Harbor.Repository
 
   @fields ~w(id name is_active x_pos y_pos)a
 

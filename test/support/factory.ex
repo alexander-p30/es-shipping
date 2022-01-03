@@ -1,7 +1,7 @@
 defmodule EsShipping.Factory do
   use ExMachina.Ecto, repo: EsShipping.Repo
 
-  use EsShipping.Factory.Harbors
+  use EsShipping.Factory.Harbor
 
   @spec json_params_for(factory :: atom(), attrs :: map() | Keyword.t(), opts :: Keyword.t()) ::
           map()

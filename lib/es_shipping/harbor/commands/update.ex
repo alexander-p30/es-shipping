@@ -1,4 +1,4 @@
-defmodule EsShipping.Harbors.Commands.Update do
+defmodule EsShipping.Harbor.Commands.Update do
   @moduledoc false
   use Ecto.Schema
 
@@ -40,12 +40,12 @@ defmodule EsShipping.Harbors.Commands.Update do
   end
 end
 
-defimpl EsShipping.Command.Validation, for: EsShipping.Harbors.Commands.Update do
+defimpl EsShipping.Command.Validation, for: EsShipping.Harbor.Commands.Update do
   import Ecto.Changeset
 
   alias Ecto.Changeset
-  alias EsShipping.Harbors.Commands.Update
-  alias EsShipping.Harbors.Repository
+  alias EsShipping.Harbor.Commands.Update
+  alias EsShipping.Harbor.Repository
 
   @spec validate(command :: Update.t()) :: {:ok, Update.t()} | {:error, Ecto.Changeset.t()}
   def validate(command) do

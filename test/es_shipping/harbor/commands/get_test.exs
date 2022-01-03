@@ -1,10 +1,10 @@
-defmodule EsShipping.Harbors.Commands.GetTest do
+defmodule EsShipping.Harbor.Commands.GetTest do
   use EsShipping.DataCase, async: true
 
   import EsShipping.Factory
 
   alias EsShipping.Command
-  alias EsShipping.Harbors.Commands.Get
+  alias EsShipping.Harbor.Commands.Get
 
   @id Ecto.UUID.generate()
 

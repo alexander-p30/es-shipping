@@ -1,4 +1,4 @@
-defmodule EsShipping.Harbors.Projector do
+defmodule EsShipping.Harbor.Projector do
   @moduledoc """
   Projects events to the read model's table
   in database.
@@ -12,8 +12,8 @@ defmodule EsShipping.Harbors.Projector do
     name: :v1_harbors_projector,
     consistency: :strong
 
-  alias EsShipping.Harbors.Events.Created
-  alias EsShipping.Harbors.Projection
+  alias EsShipping.Harbor.Events.Created
+  alias EsShipping.Harbor.Projection
 
   project(%Created{} = event, _metadata, fn multi ->
     Ecto.Multi.insert(multi, :harbor, %Projection{
