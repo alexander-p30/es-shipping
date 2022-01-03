@@ -1,6 +1,6 @@
 defmodule EsShipping.Harbor do
   @moduledoc """
-  Aggregate module for harbor-related commands.
+  Harbor state manager.
   """
 
   alias EsShipping.Command
