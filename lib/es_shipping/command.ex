@@ -4,12 +4,11 @@ defmodule EsShipping.Command do
   Holds functions for validating and converting commands.
   """
 
-  alias EsShipping.Command.{Errors, Events, Validations}
+  alias EsShipping.Command.{Events, Validation}
   alias EsShipping.Event
   alias EsShipping.Harbor
-  alias EsShipping.Harbors.Commands, as: HarborsCommands
 
-  @type t() :: HarborsCommands.t()
+  @type t() :: Harbor.command()
   @type aggregate() :: Harbor.t()
 
   @doc """
@@ -21,13 +20,7 @@ defmodule EsShipping.Command do
   Check the command's values validity according to its validation changeset.
   """
   @spec validate(command :: t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
-  defdelegate validate(command), to: Validations
-
-  @doc """
-  Converts a changeset's first error to an atom message.
-  """
-  @spec parse_errors(changeset :: Ecto.Changeset.t()) :: list(atom())
-  def parse_errors(changeset), do: Errors.parse(changeset)
+  defdelegate validate(command), to: Validation
 
   @doc """
   Converts a command to its corresponding event.

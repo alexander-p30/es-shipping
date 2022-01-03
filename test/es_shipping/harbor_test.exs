@@ -39,10 +39,10 @@ defmodule EsShipping.HarborTest do
       assert ctx.create_event == Harbor.execute(%Harbor{}, ctx.create_command)
     end
 
-    test "return an error atom when create harbor command is invalid", ctx do
+    test "return a changeset when create harbor command is invalid", ctx do
       ctx = put_in(ctx.create_command.name, nil)
 
-      assert {:error, {:validation, [:must_have_name]}} ==
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false}}} =
                Harbor.execute(%Harbor{}, ctx.create_command)
     end
 
@@ -60,8 +60,10 @@ defmodule EsShipping.HarborTest do
     test "return an error atom when update harbor command is invalid", ctx do
       ctx = put_in(ctx.update_command.name, nil)
 
-      assert {:error, {:validation, [:must_have_name]}} ==
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                Harbor.execute(%Harbor{id: ctx.update_command.id}, ctx.update_command)
+
+      assert %{name: ["can't be blank"]} == errors_on(changeset)
     end
 
     test "return harbor not found when identity does not match in update", ctx do

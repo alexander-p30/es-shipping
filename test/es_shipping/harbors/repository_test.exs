@@ -21,4 +21,18 @@ defmodule EsShipping.Harbors.RepositoryTest do
       assert [] == Repository.get_by(name: "X", x_pos: 55, y_pos: 13_718, is_active: false)
     end
   end
+
+  describe "unique_position?/2" do
+    setup do
+      %{harbor: insert(:harbor_projection)}
+    end
+
+    test "return true when coordinates match a database record", %{harbor: harbor} do
+      refute Repository.unique_position?(harbor.x_pos, harbor.y_pos)
+    end
+
+    test "return false when coordinates do not match a database record" do
+      assert Repository.unique_position?(987_654, 123_456)
+    end
+  end
 end

@@ -6,6 +6,7 @@ defmodule EsShipping.Harbors.Projection do
   @type t :: %__MODULE__{
           id: Ecto.UUID.t(),
           name: String.t(),
+          is_active: boolean(),
           x_pos: non_neg_integer(),
           y_pos: non_neg_integer(),
           inserted_at: NaiveDateTime.t(),

@@ -24,20 +24,30 @@ defmodule EsShippingWeb do
       import Plug.Conn
       alias EsShippingWeb.Router.Helpers, as: Routes
 
-      defp send_json(conn, status, body, details \\ [])
+      defp send_json(conn, status, body, opts \\ [])
 
-      defp send_json(conn, status, body, details) when status >= 400 do
-        content = details |> Map.new() |> Map.merge(%{errors: body})
-
+      defp send_json(conn, status, body, _opts) when status >= 400 do
         conn
         |> put_resp_header("content-type", "application/json")
-        |> send_resp(status, Jason.encode!(content))
+        |> put_status(status)
+        |> json(%{errors: body})
       end
 
-      defp send_json(conn, status, body, _details) do
+      defp send_json(conn, status, body, _opts) do
         conn
         |> put_resp_header("content-type", "application/json")
-        |> send_resp(status, Jason.encode!(body))
+        |> put_status(status)
+        |> json(body)
+      end
+
+      defp get_changeset_errors(%Ecto.Changeset{valid?: false, errors: errors}) do
+        Map.new(errors, fn
+          {field, {message, [validation: :required]}} ->
+            {field, message}
+
+          {field, {message, [{:validation, :number} | _] = validation}} ->
+            {field, String.replace(message, "%{number}", "#{validation[:number]}")}
+        end)
       end
     end
   end

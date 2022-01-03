@@ -4,7 +4,6 @@ defmodule EsShipping.Harbor do
   """
 
   alias EsShipping.Command
-  alias EsShipping.Harbors.Commands
   alias EsShipping.Harbors.Commands.Create
   alias EsShipping.Harbors.Commands.Get
   alias EsShipping.Harbors.Commands.Update
@@ -21,8 +20,8 @@ defmodule EsShipping.Harbor do
         }
 
   # TODO: consider changing this error format
-  @typep error :: {:validation, list(atom())} | {:internal, atom()}
-  @type command :: Commands.t()
+  @typep error :: {:validation, Ecto.Changeset.t()} | {:internal, atom()}
+  @type command :: Create.t() | Get.t() | Update.t()
   @type command_execution :: {:ok, t()} | {:error, error()}
   @type event :: Created.t() | Updated.t() | Got.t()
 
@@ -75,7 +74,7 @@ defmodule EsShipping.Harbor do
   defp do_execute(aggregate, command) do
     case Command.validate(command) do
       {:ok, command} -> Command.to_event(aggregate, command)
-      {:error, changeset} -> {:error, {:validation, Command.parse_errors(changeset)}}
+      {:error, changeset} -> {:error, {:validation, changeset}}
     end
   end
 end

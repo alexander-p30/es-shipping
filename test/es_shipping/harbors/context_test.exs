@@ -41,24 +41,32 @@ defmodule EsShipping.Harbors.ContextTest do
       assert_in_delta NaiveDateTime.diff(projection.updated_at, NaiveDateTime.utc_now()), 0, 1
     end
 
-    test "return error when name is invalid", %{params: params} do
-      assert {:error, {:validation, [:must_have_name]}} ==
+    test "return invalid changeset when name is invalid", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                params |> Map.put("name", nil) |> Context.create_harbor()
+
+      assert %{name: ["can't be blank"]} == errors_on(changeset)
     end
 
-    test "return error when active status is invalid", %{params: params} do
-      assert {:error, {:validation, [:must_have_is_active]}} ==
+    test "return invalid changeset when active status is invalid", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                params |> Map.put("is_active", nil) |> Context.create_harbor()
+
+      assert %{is_active: ["can't be blank"]} == errors_on(changeset)
     end
 
-    test "return error when x_pos is invalid", %{params: params} do
-      assert {:error, {:validation, [:x_pos_must_be_higher_than_0]}} ==
+    test "return invalid changeset when x_pos is invalid", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                params |> Map.put("x_pos", -40) |> Context.create_harbor()
+
+      assert %{x_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
     end
 
-    test "return error when y_pos is invalid", %{params: params} do
-      assert {:error, {:validation, [:y_pos_must_be_higher_than_0]}} ==
+    test "return invalid changeset when y_pos is invalid", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                params |> Map.put("y_pos", -1_273_182) |> Context.create_harbor()
+
+      assert %{y_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
     end
   end
 
@@ -102,27 +110,47 @@ defmodule EsShipping.Harbors.ContextTest do
       assert id == ctx.harbor.id
     end
 
-    test "return error when name is invalid", %{params: params} do
-      assert {:error, {:validation, [:must_have_name]}} ==
+    test "return invalid changeset when name is invalid", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                Context.update_harbor(%{"id" => params["id"], "name" => nil})
+
+      assert %{name: ["can't be blank"]} == errors_on(changeset)
     end
 
-    test "return error when active status is invalid", %{params: params} do
-      assert {:error, {:validation, [:must_have_is_active]}} ==
+    test "return invalid changeset when active status is invalid", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                Context.update_harbor(%{"id" => params["id"], "is_active" => nil})
+
+      assert %{is_active: ["can't be blank"]} == errors_on(changeset)
     end
 
-    test "return error when x_pos is invalid", %{params: params} do
-      assert {:error, {:validation, [:x_pos_must_be_higher_than_0]}} ==
+    test "return invalid changeset when x_pos is present but y_pos not", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                Context.update_harbor(%{"id" => params["id"], "x_pos" => -3})
+
+      assert %{x_pos: ["coordinates must come in pairs"]} == errors_on(changeset)
     end
 
-    test "return error when y_pos is invalid", %{params: params} do
-      assert {:error, {:validation, [:y_pos_must_be_higher_than_0]}} ==
+    test "return invalid changeset when y_pos is present but x_pos not", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
                Context.update_harbor(%{"id" => params["id"], "y_pos" => -321})
+
+      assert %{y_pos: ["coordinates must come in pairs"]} == errors_on(changeset)
     end
 
-    test "return error when id is not associated with any harbor" do
+    test "return invalid changeset when x_pos or y_pos are invalid", %{params: params} do
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
+               Context.update_harbor(%{"id" => params["id"], "x_pos" => 123, "y_pos" => -321})
+
+      assert %{y_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
+
+      assert {:error, {:validation, %Ecto.Changeset{valid?: false} = changeset}} =
+               Context.update_harbor(%{"id" => params["id"], "x_pos" => -123, "y_pos" => 321})
+
+      assert %{x_pos: ["must be greater than or equal to 0"]} == errors_on(changeset)
+    end
+
+    test "return internal error when id is not associated with any harbor" do
       assert {:error, {:internal, :harbor_not_found}} ==
                Context.update_harbor(%{"id" => Ecto.UUID.generate()})
     end
@@ -149,7 +177,7 @@ defmodule EsShipping.Harbors.ContextTest do
       assert {:ok, harbor} == Context.get_harbor(harbor.id)
     end
 
-    test "return error when id is not associated with any harbor" do
+    test "return internal error when id is not associated with any harbor" do
       assert {:error, {:internal, :harbor_not_found}} ==
                Context.get_harbor(Ecto.UUID.generate())
     end

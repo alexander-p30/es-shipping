@@ -1,5 +1,6 @@
 defmodule EsShipping.Harbors.Commands.Update do
   @moduledoc false
+  use Ecto.Schema
 
   @behaviour EsShipping.Command
 
@@ -14,7 +15,17 @@ defmodule EsShipping.Harbors.Commands.Update do
 
   @fields ~w(name is_active x_pos y_pos)a
 
-  defstruct [:id, :received_fields | @fields]
+  @primary_key false
+  embedded_schema do
+    field :id, Ecto.UUID
+    field :received_fields, {:array, :string}
+
+    field :name, :string
+    field :is_active, :boolean
+
+    field :x_pos, :integer
+    field :y_pos, :integer
+  end
 
   @impl true
   def new(%{} = params) do
@@ -27,4 +38,68 @@ defmodule EsShipping.Harbors.Commands.Update do
       received_fields: Enum.filter(@fields, &Map.has_key?(params, &1))
     }
   end
+end
+
+defimpl EsShipping.Command.Validation, for: EsShipping.Harbors.Commands.Update do
+  import Ecto.Changeset
+
+  alias Ecto.Changeset
+  alias EsShipping.Harbors.Commands.Update
+  alias EsShipping.Harbors.Repository
+
+  @spec validate(command :: Update.t()) :: {:ok, Update.t()} | {:error, Ecto.Changeset.t()}
+  def validate(command) do
+    params = Map.from_struct(command)
+
+    %Update{}
+    |> cast(params, command.received_fields)
+    |> validate_required(command.received_fields)
+    |> validate_coordinates()
+    |> case do
+      %Changeset{valid?: true} = changeset ->
+        {:ok, changeset |> apply_changes() |> Map.put(:received_fields, command.received_fields)}
+
+      %Changeset{valid?: false} = changeset ->
+        {:error, changeset}
+    end
+  end
+
+  @spec validate_coordinates(Ecto.Changeset.t()) :: Ecto.Changeset.t()
+  defp validate_coordinates(changeset) do
+    coordinates = get_coordinates(changeset)
+
+    case Enum.count(coordinates) do
+      2 ->
+        changeset
+        |> validate_number(:x_pos, greater_than_or_equal_to: 0)
+        |> validate_number(:y_pos, greater_than_or_equal_to: 0)
+        |> validate_unique_position(coordinates)
+
+      1 ->
+        present_coordinate = coordinates |> Map.keys() |> List.first()
+        add_error(changeset, present_coordinate, "coordinates must come in pairs")
+
+      _ ->
+        changeset
+    end
+  end
+
+  @spec validate_unique_position(changeset :: Ecto.Changeset.t(), coordinates :: map()) ::
+          Ecto.Changeset.t()
+  defp validate_unique_position(%Changeset{valid?: false} = changeset, _), do: changeset
+
+  defp validate_unique_position(changeset, %{x_pos: x_pos, y_pos: y_pos}) do
+    if Repository.unique_position?(x_pos, y_pos) do
+      changeset
+    else
+      Enum.reduce(
+        [:x_pos, :y_pos],
+        changeset,
+        &add_error(&2, &1, "x, y combination already taken")
+      )
+    end
+  end
+
+  @spec get_coordinates(changeset :: Ecto.Changeset.t()) :: map()
+  defp get_coordinates(changeset), do: Map.take(changeset.changes, [:x_pos, :y_pos])
 end

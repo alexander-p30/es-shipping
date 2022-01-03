@@ -30,7 +30,7 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
     test "return an error json when name is invalid", ctx do
       invalid_params = Map.put(ctx.params, "name", nil)
 
-      assert %{"errors" => ["must_have_name"], "entity" => "harbor"} =
+      assert %{"errors" => %{"name" => "can't be blank"}} ==
                ctx.conn |> post(@create_url, invalid_params) |> json_response(422)
     end
 
@@ -38,14 +38,13 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
       invalid_params = %{}
 
       assert %{
-               "errors" => [
-                 "y_pos_must_be_higher_than_0",
-                 "x_pos_must_be_higher_than_0",
-                 "must_have_is_active",
-                 "must_have_name"
-               ],
-               "entity" => "harbor"
-             } = ctx.conn |> post(@create_url, invalid_params) |> json_response(422)
+               "errors" => %{
+                 "is_active" => "can't be blank",
+                 "name" => "can't be blank",
+                 "x_pos" => "can't be blank",
+                 "y_pos" => "can't be blank"
+               }
+             } == ctx.conn |> post(@create_url, invalid_params) |> json_response(422)
     end
   end
 
@@ -88,18 +87,17 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
       }
 
       assert %{
-               "errors" => [
-                 "y_pos_must_be_higher_than_0",
-                 "x_pos_must_be_higher_than_0",
-                 "must_have_is_active",
-                 "must_have_name"
-               ],
-               "entity" => "harbor"
-             } = ctx.conn |> put(@update_url <> ctx.id, invalid_params) |> json_response(422)
+               "errors" => %{
+                 "is_active" => "can't be blank",
+                 "name" => "can't be blank",
+                 "x_pos" => "must be greater than or equal to 0",
+                 "y_pos" => "must be greater than or equal to 0"
+               }
+             } == ctx.conn |> put(@update_url <> ctx.id, invalid_params) |> json_response(422)
     end
 
     test "return not found when id is not associated with any harbor", ctx do
-      assert %{"errors" => "harbor_not_found", "entity" => "harbor"} =
+      assert %{"errors" => "harbor_not_found"} ==
                ctx.conn
                |> put(@update_url <> Ecto.UUID.generate(), %{})
                |> json_response(404)
@@ -131,7 +129,7 @@ defmodule EsShippingWeb.Controllers.V1.HarborControllerTest do
     end
 
     test "return not found error when id is not associated with any harbor", ctx do
-      assert %{"entity" => "harbor", "errors" => "harbor_not_found"} ==
+      assert %{"errors" => "harbor_not_found"} ==
                ctx.conn |> get(@show_url <> Ecto.UUID.generate()) |> json_response(404)
     end
   end

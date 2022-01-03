@@ -26,8 +26,8 @@ defmodule EsShippingWeb.Controllers.V1.HarborController do
   defp send_response({:ok, %Harbor{} = harbor}, conn), do: send_json(conn, 201, harbor)
 
   defp send_response({:error, {:internal, :harbor_not_found = reason}}, conn),
-    do: send_json(conn, 404, reason, entity: "harbor")
+    do: send_json(conn, 404, reason)
 
-  defp send_response({:error, {:validation, reason}}, conn),
-    do: send_json(conn, 422, reason, entity: "harbor")
+  defp send_response({:error, {:validation, changeset}}, conn),
+    do: send_json(conn, 422, get_changeset_errors(changeset))
 end
