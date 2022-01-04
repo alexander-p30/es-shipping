@@ -1,15 +1,15 @@
-defmodule EsShipping.Factory.Harbor do
+defmodule EsShipping.Factory.Harbors do
+  alias EsShipping.Harbor
+  alias EsShipping.Harbor.Commands.Create
+  alias EsShipping.Harbor.Commands.Get
+  alias EsShipping.Harbor.Commands.Update
+  alias EsShipping.Harbor.Events.Created
+  alias EsShipping.Harbor.Events.Got
+  alias EsShipping.Harbor.Events.Updated
+  alias EsShipping.Harbor.Projection
+
   defmacro __using__(_) do
     quote do
-      alias EsShipping.Harbor
-      alias EsShipping.Harbor.Commands.Create
-      alias EsShipping.Harbor.Commands.Get
-      alias EsShipping.Harbor.Commands.Update
-      alias EsShipping.Harbor.Events.Created
-      alias EsShipping.Harbor.Events.Got
-      alias EsShipping.Harbor.Events.Updated
-      alias EsShipping.Harbor.Projection
-
       def harbor_factory(attrs) do
         harbor = %Harbor{name: "a name", is_active: true, x_pos: 0, y_pos: 0}
 

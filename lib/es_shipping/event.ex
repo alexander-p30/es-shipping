@@ -4,6 +4,7 @@ defmodule EsShipping.Event do
   """
 
   alias EsShipping.Harbor
+  alias EsShipping.Ship
 
-  @type t() :: Harbor.event()
+  @type t() :: Harbor.event() | Ship.event()
 end

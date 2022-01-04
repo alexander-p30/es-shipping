@@ -6,10 +6,10 @@ defmodule EsShipping.Command do
 
   alias EsShipping.Command.{Conversion, Validation}
   alias EsShipping.Event
-  alias EsShipping.Harbor
+  alias EsShipping.{Harbor, Ship}
 
-  @type t() :: Harbor.command()
-  @type aggregate() :: Harbor.t()
+  @type t() :: Harbor.command() | Ship.command()
+  @type aggregate() :: Harbor.t() | Ship.t()
 
   @doc """
   Builds a command with the received parameters.
