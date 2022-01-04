@@ -52,7 +52,7 @@ defimpl EsShipping.Command.Validation, for: EsShipping.Harbor.Commands.Update do
     params = Map.from_struct(command)
 
     %Update{}
-    |> cast(params, command.received_fields)
+    |> cast(params, [:id | command.received_fields])
     |> validate_required(command.received_fields)
     |> validate_coordinates()
     |> case do
@@ -110,13 +110,13 @@ defimpl EsShipping.Command.Conversion, for: EsShipping.Harbor.Commands.Update do
   alias EsShipping.Harbor.Events.Updated
 
   @spec to_event(command :: Update.t(), aggregate :: Harbor.t()) :: Updated.t()
-  def to_event(command, _) do
-    %Updated{
-      id: command.id,
-      name: command.name,
-      is_active: command.is_active,
-      x_pos: command.x_pos,
-      y_pos: command.y_pos
-    }
+  def to_event(%Update{received_fields: received_fields} = command, aggregate) do
+    ~w(name is_active x_pos y_pos)a
+    |> Enum.reduce(%Updated{}, fn field, event ->
+      data_origin = if field in received_fields, do: command, else: aggregate
+      Map.put(event, field, Map.fetch!(data_origin, field))
+    end)
+    |> Map.put(:updated_fields, received_fields)
+    |> Map.put(:id, aggregate.id)
   end
 end

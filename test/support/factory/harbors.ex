@@ -71,7 +71,8 @@ defmodule EsShipping.Factory.Harbor do
           name: "some other name",
           is_active: true,
           x_pos: 123,
-          y_pos: 987
+          y_pos: 987,
+          updated_fields: ~w(id name is_active x_pos y_pos)a
         }
 
         merge_attributes(event, attrs)

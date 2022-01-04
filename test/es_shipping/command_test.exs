@@ -37,7 +37,8 @@ defmodule EsShipping.CommandTest do
              is_active: false,
              x_pos: 12_038,
              y_pos: 0
-           }, fn _ -> %Harbor{} end, &build(:update_harbor, &1), &build(:harbor_updated, &1)},
+           }, fn %{id: id} -> %Harbor{id: id} end, &build(:update_harbor, &1),
+           &build(:harbor_updated, &1)},
           {%{
              id: Ecto.UUID.generate(),
              name: "A harbor",
