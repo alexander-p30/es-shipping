@@ -77,3 +77,20 @@ defimpl EsShipping.Command.Validation, for: EsShipping.Harbor.Commands.Create do
     end
   end
 end
+
+defimpl EsShipping.Command.Conversion, for: EsShipping.Harbor.Commands.Create do
+  alias EsShipping.Harbor
+  alias EsShipping.Harbor.Commands.Create
+  alias EsShipping.Harbor.Events.Created
+
+  @spec to_event(command :: Create.t(), aggregate :: Harbor.t()) :: Created.t()
+  def to_event(command, _) do
+    %Created{
+      id: command.id,
+      name: command.name,
+      is_active: command.is_active,
+      x_pos: command.x_pos,
+      y_pos: command.y_pos
+    }
+  end
+end

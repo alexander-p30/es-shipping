@@ -73,7 +73,7 @@ defmodule EsShipping.Harbor do
   @spec do_execute(aggregate :: t(), command :: command()) :: {:ok, event()} | {:error, error()}
   defp do_execute(aggregate, command) do
     case Command.validate(command) do
-      {:ok, command} -> Command.to_event(aggregate, command)
+      {:ok, command} -> Command.to_event(command, aggregate)
       {:error, changeset} -> {:error, {:validation, changeset}}
     end
   end

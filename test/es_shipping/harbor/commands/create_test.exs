@@ -5,6 +5,7 @@ defmodule EsShipping.Harbor.Commands.CreateTest do
 
   alias EsShipping.Command
   alias EsShipping.Harbor.Commands.Create
+  alias EsShipping.Harbor.Events.Created
 
   describe "new/1" do
     test "return a create command struct with a generated id" do
@@ -17,7 +18,7 @@ defmodule EsShipping.Harbor.Commands.CreateTest do
     end
   end
 
-  describe "implementation of validate" do
+  describe "implementation of validation" do
     setup do
       %{command: build(:create_harbor)}
     end
@@ -43,6 +44,22 @@ defmodule EsShipping.Harbor.Commands.CreateTest do
       insert(:harbor_projection, params)
 
       assert {:error, %Ecto.Changeset{valid?: false}} = Command.validate(command)
+    end
+  end
+
+  describe "implementation of conversion" do
+    setup do
+      %{command: build(:create_harbor)}
+    end
+
+    test "return created event", %{command: command} do
+      assert %Created{
+               id: command.id,
+               name: command.name,
+               is_active: command.is_active,
+               x_pos: command.x_pos,
+               y_pos: command.y_pos
+             } == Command.to_event(command, nil)
     end
   end
 end

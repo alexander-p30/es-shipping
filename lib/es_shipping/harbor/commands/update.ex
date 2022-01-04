@@ -103,3 +103,20 @@ defimpl EsShipping.Command.Validation, for: EsShipping.Harbor.Commands.Update do
   @spec get_coordinates(changeset :: Ecto.Changeset.t()) :: map()
   defp get_coordinates(changeset), do: Map.take(changeset.changes, [:x_pos, :y_pos])
 end
+
+defimpl EsShipping.Command.Conversion, for: EsShipping.Harbor.Commands.Update do
+  alias EsShipping.Harbor
+  alias EsShipping.Harbor.Commands.Update
+  alias EsShipping.Harbor.Events.Updated
+
+  @spec to_event(command :: Update.t(), aggregate :: Harbor.t()) :: Updated.t()
+  def to_event(command, _) do
+    %Updated{
+      id: command.id,
+      name: command.name,
+      is_active: command.is_active,
+      x_pos: command.x_pos,
+      y_pos: command.y_pos
+    }
+  end
+end

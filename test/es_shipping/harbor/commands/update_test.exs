@@ -5,6 +5,7 @@ defmodule EsShipping.Harbor.Commands.UpdateTest do
 
   alias EsShipping.Command
   alias EsShipping.Harbor.Commands.Update
+  alias EsShipping.Harbor.Events.Updated
 
   describe "new/1" do
     setup do
@@ -44,7 +45,7 @@ defmodule EsShipping.Harbor.Commands.UpdateTest do
     end
   end
 
-  describe "implementation of validate" do
+  describe "implementation of validation" do
     setup do
       %{command: build(:update_harbor)}
     end
@@ -77,6 +78,22 @@ defmodule EsShipping.Harbor.Commands.UpdateTest do
       insert(:harbor_projection, params)
 
       assert {:error, %Ecto.Changeset{valid?: false}} = Command.validate(command)
+    end
+  end
+
+  describe "implementation of conversion" do
+    setup do
+      %{command: build(:update_harbor)}
+    end
+
+    test "return a updated event", %{command: command} do
+      assert %Updated{
+               id: command.id,
+               name: command.name,
+               is_active: command.is_active,
+               x_pos: command.x_pos,
+               y_pos: command.y_pos
+             } == Command.to_event(command, nil)
     end
   end
 end

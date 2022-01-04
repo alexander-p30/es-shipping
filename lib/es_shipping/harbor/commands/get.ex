@@ -36,3 +36,20 @@ defimpl EsShipping.Command.Validation, for: EsShipping.Harbor.Commands.Get do
     end
   end
 end
+
+defimpl EsShipping.Command.Conversion, for: EsShipping.Harbor.Commands.Get do
+  alias EsShipping.Harbor
+  alias EsShipping.Harbor.Commands.Get
+  alias EsShipping.Harbor.Events.Got
+
+  @spec to_event(command :: Get.t(), aggregate :: Harbor.t()) :: Got.t()
+  def to_event(command, aggregate) do
+    %Got{
+      id: command.id,
+      name: aggregate.name,
+      is_active: aggregate.is_active,
+      x_pos: aggregate.x_pos,
+      y_pos: aggregate.y_pos
+    }
+  end
+end

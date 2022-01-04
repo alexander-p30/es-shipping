@@ -4,7 +4,7 @@ defmodule EsShipping.Command do
   Holds functions for validating and converting commands.
   """
 
-  alias EsShipping.Command.{Events, Validation}
+  alias EsShipping.Command.{Conversion, Validation}
   alias EsShipping.Event
   alias EsShipping.Harbor
 
@@ -17,14 +17,14 @@ defmodule EsShipping.Command do
   @callback new(params :: map()) :: t()
 
   @doc """
-  Check the command's values validity according to its validation changeset.
+  Check the command's values validity.
   """
   @spec validate(command :: t()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
   defdelegate validate(command), to: Validation
 
   @doc """
-  Converts a command to its corresponding event.
+  Converts a command to its corresponding event(s).
   """
-  @spec to_event(aggregate :: aggregate(), command :: t()) :: Event.t()
-  def to_event(aggregate, command), do: Events.from_command(aggregate, command)
+  @spec to_event(command :: t(), aggregate :: aggregate()) :: Event.t()
+  defdelegate to_event(command, aggregate), to: Conversion
 end

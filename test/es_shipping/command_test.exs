@@ -51,7 +51,7 @@ defmodule EsShipping.CommandTest do
           command = build_command_fn.(attrs)
           event = build_event_fn.(attrs)
 
-          assert event == Command.to_event(aggregate, command)
+          assert event == Command.to_event(command, aggregate)
         end
       )
     end
