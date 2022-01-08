@@ -95,19 +95,24 @@ defmodule EsShipping.Harbor.ContextTest do
       %{harbor: harbor, params: update_params}
     end
 
-    test "return an aggregate state when params are valid", ctx do
-      %{"name" => name, "x_pos" => x_pos, "y_pos" => y_pos} = ctx.params
+    test "return an updated aggregate state and update projection when params are valid", ctx do
+      params =
+        %{"x_pos" => x_pos, "y_pos" => y_pos} = Map.take(ctx.params, ["id", "x_pos", "y_pos"])
+
+      %{name: name, is_active: is_active} = ctx.harbor
 
       assert {:ok,
               %Harbor{
-                id: id,
                 name: ^name,
-                is_active: true,
+                is_active: ^is_active,
                 x_pos: ^x_pos,
                 y_pos: ^y_pos
-              }} = Context.update_harbor(ctx.params)
+              } = updated_harbor} = Context.update_harbor(params)
 
-      assert id == ctx.harbor.id
+      assert updated_harbor.id == ctx.harbor.id
+
+      assert %{name: ^name, is_active: ^is_active, x_pos: ^x_pos, y_pos: ^y_pos} =
+               Repo.get(Projection, updated_harbor.id)
     end
 
     test "return invalid changeset when name is invalid", %{params: params} do
