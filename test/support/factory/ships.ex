@@ -24,6 +24,13 @@ defmodule EsShipping.Factory.Ships do
         }
 
         merge_attributes(command, attrs)
+      def move_ship_factory do
+        %Move{
+          id: Ecto.UUID.generate(),
+          x_pos: 672,
+          y_pos: 378,
+          received_coordinates: [:x_pos, :y_pos]
+        }
       end
     end
   end

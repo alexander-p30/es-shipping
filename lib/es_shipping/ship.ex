@@ -4,8 +4,8 @@ defmodule EsShipping.Ship do
   """
 
   alias EsShipping.Command
-  alias EsShipping.Ship.Commands.Create
-  alias EsShipping.Ship.Events.Created
+  alias EsShipping.Ship.Commands.{Create, Move}
+  alias EsShipping.Ship.Events.{Created, Moved}
 
   @type t :: %__MODULE__{
           id: Ecto.UUID.t() | nil,
@@ -17,9 +17,9 @@ defmodule EsShipping.Ship do
         }
 
   @typep error :: {:validation, Ecto.Changeset.t()} | {:internal, atom()}
-  @type command :: Create.t()
+  @type command :: Create.t() | Move.t()
   @type command_execution :: {:ok, t()} | {:error, error()}
-  @type event :: Created.t()
+  @type event :: Created.t() | Moved.t()
 
   @struct_fields ~w(id name is_active is_docked x_pos y_pos )a
 
