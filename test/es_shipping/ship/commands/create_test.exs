@@ -31,7 +31,9 @@ defmodule EsShipping.Ship.Commands.CreateTest do
       %{command: create_ship, harbor: harbor}
     end
 
-    test "return create struct when all params are valid", %{command: command} do
+    test "return create struct when all params are valid", %{command: command, harbor: harbor} do
+      assert command.x_pos == harbor.x_pos
+      assert command.y_pos == harbor.y_pos
       assert {:ok, command} == Command.validate(command)
     end
 
@@ -48,8 +50,21 @@ defmodule EsShipping.Ship.Commands.CreateTest do
     end
 
     test "return invalid changeset when coordinates do not match that of an active harbor", ctx do
+      ctx = put_in(ctx.command.x_pos, 832)
+
+      assert {:error, %Ecto.Changeset{valid?: false} = changeset} = Command.validate(ctx.command)
+
+      assert %{
+               x_pos: ["no active harbor in coordinate pair"],
+               y_pos: ["no active harbor in coordinate pair"]
+             } ==
+               errors_on(changeset)
+
+      ctx = put_in(ctx.command.x_pos, ctx.harbor.x_pos)
       ctx.harbor |> Ecto.Changeset.change(%{is_active: false}) |> EsShipping.Repo.update!()
 
+      assert ctx.command.x_pos == ctx.harbor.x_pos
+      assert ctx.command.y_pos == ctx.harbor.y_pos
       assert {:error, %Ecto.Changeset{valid?: false} = changeset} = Command.validate(ctx.command)
 
       assert %{
